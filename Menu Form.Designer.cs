@@ -1,4 +1,4 @@
-﻿namespace RestaurantDesktopApp
+namespace RestaurantDesktopApp
 {
     partial class Menu_Form
     {
@@ -12,6 +12,8 @@
         private TextBox txtPrice;
         private TextBox txtCategory;
         private Button btnAddItem;
+        private Button btnUpdateItem;
+        private Button btnDeleteItem;
         private DataGridView dgvMenuItems;
 
         protected override void Dispose(bool disposing)
@@ -33,6 +35,8 @@
             txtPrice = new TextBox();
             txtCategory = new TextBox();
             btnAddItem = new Button();
+            btnUpdateItem = new Button();
+            btnDeleteItem = new Button();
             dgvMenuItems = new DataGridView();
 
             ((System.ComponentModel.ISupportInitialize)(dgvMenuItems)).BeginInit();
@@ -72,9 +76,21 @@
 
             // Add Button
             btnAddItem.Text = "Add Item";
-            btnAddItem.Location = new System.Drawing.Point(150, 180);
-            btnAddItem.Size = new System.Drawing.Size(120, 30);
+            btnAddItem.Location = new System.Drawing.Point(50, 180);
+            btnAddItem.Size = new System.Drawing.Size(100, 30);
             btnAddItem.Click += btnAddItem_Click;
+
+            // Update Button
+            btnUpdateItem.Text = "Update Item";
+            btnUpdateItem.Location = new System.Drawing.Point(160, 180);
+            btnUpdateItem.Size = new System.Drawing.Size(100, 30);
+            btnUpdateItem.Click += btnUpdateItem_Click;
+
+            // Delete Button
+            btnDeleteItem.Text = "Delete Item";
+            btnDeleteItem.Location = new System.Drawing.Point(270, 180);
+            btnDeleteItem.Size = new System.Drawing.Size(100, 30);
+            btnDeleteItem.Click += btnDeleteItem_Click;
 
             // DataGridView
             dgvMenuItems.Location = new System.Drawing.Point(50, 230);
@@ -90,6 +106,8 @@
             Controls.Add(lblCategory);
             Controls.Add(txtCategory);
             Controls.Add(btnAddItem);
+            Controls.Add(btnUpdateItem);
+            Controls.Add(btnDeleteItem);
             Controls.Add(dgvMenuItems);
 
             // Form Settings

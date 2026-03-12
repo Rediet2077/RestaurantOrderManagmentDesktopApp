@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -30,6 +30,24 @@ namespace RestaurantDesktopApp
         {
             OrderForm order = new OrderForm();
             order.Show();
+        }
+
+        private void btnManageTables_Click(object sender, EventArgs e)
+        {
+            TableForm table = new TableForm();
+            table.Show();
+        }
+
+        private void btnPayments_Click(object sender, EventArgs e)
+        {
+            PaymentForm payment = new PaymentForm();
+            payment.Show();
+        }
+
+        private void btnReports_Click(object sender, EventArgs e)
+        {
+            ReportForm report = new ReportForm();
+            report.Show();
         }
     }
 }

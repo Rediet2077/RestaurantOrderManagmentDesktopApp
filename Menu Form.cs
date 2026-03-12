@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
@@ -13,6 +13,7 @@ namespace RestaurantDesktopApp
         public Menu_Form()
         {
             InitializeComponent();
+            dgvMenuItems.CellClick += dgvMenuItems_CellClick;
             LoadMenuItems();
         }
 
@@ -34,12 +35,96 @@ namespace RestaurantDesktopApp
 
                 MessageBox.Show("Item Added Successfully");
 
+                ClearFields();
                 LoadMenuItems();
             }
             catch (Exception ex)
             {
+                con.Close();
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void btnUpdateItem_Click(object sender, EventArgs e)
+        {
+            if (dgvMenuItems.SelectedRows.Count > 0)
+            {
+                try
+                {
+                    int id = Convert.ToInt32(dgvMenuItems.SelectedRows[0].Cells["ItemID"].Value);
+                    con.Open();
+                    MySqlCommand cmd = new MySqlCommand(
+                        "UPDATE MenuItems SET Name=@n, Price=@p, Category=@c WHERE ItemID=@id", con);
+                    cmd.Parameters.AddWithValue("@n", txtItemName.Text);
+                    cmd.Parameters.AddWithValue("@p", txtPrice.Text);
+                    cmd.Parameters.AddWithValue("@c", txtCategory.Text);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    MessageBox.Show("Item Updated Successfully");
+                    ClearFields();
+                    LoadMenuItems();
+                }
+                catch (Exception ex)
+                {
+                    con.Close();
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select an item to update.");
+            }
+        }
+
+        private void btnDeleteItem_Click(object sender, EventArgs e)
+        {
+            if (dgvMenuItems.SelectedRows.Count > 0)
+            {
+                try
+                {
+                    int id = Convert.ToInt32(dgvMenuItems.SelectedRows[0].Cells["ItemID"].Value);
+                    if (MessageBox.Show("Are you sure you want to delete this item?", "Delete Item", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        con.Open();
+                        MySqlCommand cmd = new MySqlCommand("DELETE FROM MenuItems WHERE ItemID=@id", con);
+                        cmd.Parameters.AddWithValue("@id", id);
+                        cmd.ExecuteNonQuery();
+                        con.Close();
+                        MessageBox.Show("Item Deleted Successfully");
+                        ClearFields();
+                        LoadMenuItems();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    con.Close();
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select an item to delete.");
+            }
+        }
+
+        private void dgvMenuItems_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvMenuItems.Rows[e.RowIndex];
+                txtItemName.Text = row.Cells["Name"].Value.ToString();
+                txtPrice.Text = row.Cells["Price"].Value.ToString();
+                txtCategory.Text = row.Cells["Category"].Value.ToString();
+            }
+        }
+
+        private void ClearFields()
+        {
+            txtItemName.Clear();
+            txtPrice.Clear();
+            txtCategory.Clear();
         }
 
         private void LoadMenuItems()

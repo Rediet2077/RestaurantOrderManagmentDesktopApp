@@ -1,4 +1,4 @@
-﻿namespace RestaurantDesktopApp
+namespace RestaurantDesktopApp
 {
     partial class Main_Form__Dashboard_
     {
@@ -30,6 +30,9 @@
         {
             btnManageMenu = new Button();
             btnCreateOrder = new Button();
+            btnManageTables = new Button();
+            btnPayments = new Button();
+            btnReports = new Button();
             btnExit = new Button();
             label1 = new Label();
             SuspendLayout();
@@ -56,13 +59,34 @@
             // 
             // btnExit
             // 
-            btnExit.Location = new Point(179, 99);
+            btnExit.Location = new Point(350, 200);
             btnExit.Name = "btnExit";
-            btnExit.Size = new Size(75, 23);
+            btnExit.Size = new Size(75, 30);
             btnExit.TabIndex = 2;
             btnExit.Text = "Exit";
             btnExit.UseVisualStyleBackColor = true;
             btnExit.Click += btnExit_Click;
+
+            // btnManageTables
+            btnManageTables.Location = new Point(360, 53);
+            btnManageTables.Name = "btnManageTables";
+            btnManageTables.Size = new Size(120, 30);
+            btnManageTables.Text = "Manage Tables";
+            btnManageTables.Click += btnManageTables_Click;
+
+            // btnPayments
+            btnPayments.Location = new Point(108, 100);
+            btnPayments.Name = "btnPayments";
+            btnPayments.Size = new Size(120, 30);
+            btnPayments.Text = "Payments";
+            btnPayments.Click += btnPayments_Click;
+
+            // btnReports
+            btnReports.Location = new Point(240, 100);
+            btnReports.Name = "btnReports";
+            btnReports.Size = new Size(120, 30);
+            btnReports.Text = "Daily Reports";
+            btnReports.Click += btnReports_Click;
             // 
             // label1
             // 
@@ -82,6 +106,9 @@
             Controls.Add(btnExit);
             Controls.Add(btnCreateOrder);
             Controls.Add(btnManageMenu);
+            Controls.Add(btnManageTables);
+            Controls.Add(btnPayments);
+            Controls.Add(btnReports);
             Name = "Main_Form__Dashboard_";
             Text = "Main_Form__Dashboard_";
             ResumeLayout(false);
@@ -92,6 +119,9 @@
 
         private Button btnManageMenu;
         private Button btnCreateOrder;
+        private Button btnManageTables;
+        private Button btnPayments;
+        private Button btnReports;
         private Button btnExit;
         private Label label1;
     }
