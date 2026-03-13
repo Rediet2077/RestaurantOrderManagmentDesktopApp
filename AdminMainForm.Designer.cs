@@ -6,6 +6,7 @@ namespace RestaurantDesktopApp
 
         private System.Windows.Forms.Panel sidebarPanel;
         private System.Windows.Forms.Panel mainPanel;
+        private System.Windows.Forms.Panel contentPanel;
         private System.Windows.Forms.Button btnManageMenu;
         private System.Windows.Forms.Button btnReports;
         private System.Windows.Forms.Button btnLogout;
@@ -23,6 +24,11 @@ namespace RestaurantDesktopApp
         private System.Windows.Forms.Panel cardTables;
         private System.Windows.Forms.Label lblTablesVal;
         private System.Windows.Forms.Label lblTablesTitle;
+        private System.Windows.Forms.Button btnSettings;
+        private System.Windows.Forms.Button btnStaff;
+        private System.Windows.Forms.Label lblGreeting;
+        private System.Windows.Forms.Label lblTime;
+        private System.Windows.Forms.Timer clockTimer;
         private System.Windows.Forms.Timer fadeTimer;
 
         protected override void Dispose(bool disposing)
@@ -47,6 +53,7 @@ namespace RestaurantDesktopApp
             this.lblPanelTitle = new System.Windows.Forms.Label();
             this.mainPanel = new System.Windows.Forms.Panel();
             this.statsPanel = new System.Windows.Forms.Panel();
+            this.contentPanel = new System.Windows.Forms.Panel();
             this.cardRevenue = new System.Windows.Forms.Panel();
             this.lblRevenueVal = new System.Windows.Forms.Label();
             this.lblRevenueTitle = new System.Windows.Forms.Label();
@@ -56,6 +63,11 @@ namespace RestaurantDesktopApp
             this.cardTables = new System.Windows.Forms.Panel();
             this.lblTablesVal = new System.Windows.Forms.Label();
             this.lblTablesTitle = new System.Windows.Forms.Label();
+            this.btnSettings = new System.Windows.Forms.Button();
+            this.btnStaff = new System.Windows.Forms.Button();
+            this.lblGreeting = new System.Windows.Forms.Label();
+            this.lblTime = new System.Windows.Forms.Label();
+            this.clockTimer = new System.Windows.Forms.Timer(this.components);
             this.fadeTimer = new System.Windows.Forms.Timer(this.components);
             this.sidebarPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
@@ -70,6 +82,8 @@ namespace RestaurantDesktopApp
             // sidebarPanel
             // 
             this.sidebarPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.sidebarPanel.Controls.Add(this.btnSettings);
+            this.sidebarPanel.Controls.Add(this.btnStaff);
             this.sidebarPanel.Controls.Add(this.btnLogout);
             this.sidebarPanel.Controls.Add(this.btnReports);
             this.sidebarPanel.Controls.Add(this.btnManageMenu);
@@ -114,6 +128,38 @@ namespace RestaurantDesktopApp
             this.btnReports.UseVisualStyleBackColor = true;
             this.btnReports.Click += new System.EventHandler(this.btnReports_Click);
             // 
+            // btnStaff
+            // 
+            this.btnStaff.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnStaff.FlatAppearance.BorderSize = 0;
+            this.btnStaff.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStaff.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnStaff.ForeColor = System.Drawing.Color.White;
+            this.btnStaff.Location = new System.Drawing.Point(0, 240);
+            this.btnStaff.Name = "btnStaff";
+            this.btnStaff.Size = new System.Drawing.Size(220, 60);
+            this.btnStaff.TabIndex = 5;
+            this.btnStaff.Text = "  👥 Staff Management";
+            this.btnStaff.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStaff.UseVisualStyleBackColor = true;
+            this.btnStaff.Click += new System.EventHandler(this.btnStaff_Click);
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnSettings.FlatAppearance.BorderSize = 0;
+            this.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSettings.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnSettings.ForeColor = System.Drawing.Color.White;
+            this.btnSettings.Location = new System.Drawing.Point(0, 300);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Size = new System.Drawing.Size(220, 60);
+            this.btnSettings.TabIndex = 6;
+            this.btnSettings.Text = "  ⚙️ System Settings";
+            this.btnSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSettings.UseVisualStyleBackColor = true;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
+            // 
             // btnManageMenu
             // 
             this.btnManageMenu.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -143,7 +189,7 @@ namespace RestaurantDesktopApp
             // 
             // picLogo
             // 
-            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\Resources\logo.png"));
+            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\..\Resources\logo.png"));
             this.picLogo.Location = new System.Drawing.Point(10, 15);
             this.picLogo.Name = "picLogo";
             this.picLogo.Size = new System.Drawing.Size(50, 50);
@@ -154,12 +200,44 @@ namespace RestaurantDesktopApp
             // headerPanel
             // 
             this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.headerPanel.Controls.Add(this.lblTime);
+            this.headerPanel.Controls.Add(this.lblGreeting);
             this.headerPanel.Controls.Add(this.lblPanelTitle);
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.headerPanel.Location = new System.Drawing.Point(220, 0);
             this.headerPanel.Name = "headerPanel";
             this.headerPanel.Size = new System.Drawing.Size(780, 70);
             this.headerPanel.TabIndex = 2;
+            // 
+            // lblGreeting
+            // 
+            this.lblGreeting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblGreeting.AutoSize = true;
+            this.lblGreeting.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular);
+            this.lblGreeting.ForeColor = System.Drawing.Color.White;
+            this.lblGreeting.Location = new System.Drawing.Point(600, 15);
+            this.lblGreeting.Name = "lblGreeting";
+            this.lblGreeting.Size = new System.Drawing.Size(95, 19);
+            this.lblGreeting.TabIndex = 1;
+            this.lblGreeting.Text = "Good Morning";
+            // 
+            // lblTime
+            // 
+            this.lblTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTime.AutoSize = true;
+            this.lblTime.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTime.ForeColor = System.Drawing.Color.White;
+            this.lblTime.Location = new System.Drawing.Point(600, 35);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(76, 21);
+            this.lblTime.TabIndex = 2;
+            this.lblTime.Text = "00:00:00";
+            // 
+            // clockTimer
+            // 
+            this.clockTimer.Enabled = true;
+            this.clockTimer.Interval = 1000;
+            this.clockTimer.Tick += new System.EventHandler(this.clockTimer_Tick);
             // 
             // lblPanelTitle
             // 
@@ -175,12 +253,21 @@ namespace RestaurantDesktopApp
             // mainPanel
             // 
             this.mainPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            this.mainPanel.Controls.Add(this.contentPanel);
             this.mainPanel.Controls.Add(this.statsPanel);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(220, 70);
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.Size = new System.Drawing.Size(780, 530);
             this.mainPanel.TabIndex = 1;
+            // 
+            // contentPanel
+            // 
+            this.contentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.contentPanel.Location = new System.Drawing.Point(0, 150);
+            this.contentPanel.Name = "contentPanel";
+            this.contentPanel.Size = new System.Drawing.Size(780, 380);
+            this.contentPanel.TabIndex = 1;
             // 
             // statsPanel
             // 

@@ -6,6 +6,7 @@ namespace RestaurantDesktopApp
 
         private System.Windows.Forms.Panel sidebarPanel;
         private System.Windows.Forms.Panel mainPanel;
+        private System.Windows.Forms.Panel contentPanel;
         private System.Windows.Forms.Button btnCreateOrder;
         private System.Windows.Forms.Button btnManageTables;
         private System.Windows.Forms.Button btnPayments;
@@ -24,6 +25,9 @@ namespace RestaurantDesktopApp
         private System.Windows.Forms.Panel cardMenu;
         private System.Windows.Forms.Label lblMenuVal;
         private System.Windows.Forms.Label lblMenuTitle;
+        private System.Windows.Forms.Label lblGreeting;
+        private System.Windows.Forms.Label lblTime;
+        private System.Windows.Forms.Timer clockTimer;
         private System.Windows.Forms.Timer fadeTimer;
 
         protected override void Dispose(bool disposing)
@@ -49,6 +53,7 @@ namespace RestaurantDesktopApp
             this.lblPanelTitle = new System.Windows.Forms.Label();
             this.mainPanel = new System.Windows.Forms.Panel();
             this.statsPanel = new System.Windows.Forms.Panel();
+            this.contentPanel = new System.Windows.Forms.Panel();
             this.cardTables = new System.Windows.Forms.Panel();
             this.lblTablesVal = new System.Windows.Forms.Label();
             this.lblTablesTitle = new System.Windows.Forms.Label();
@@ -58,6 +63,9 @@ namespace RestaurantDesktopApp
             this.cardMenu = new System.Windows.Forms.Panel();
             this.lblMenuVal = new System.Windows.Forms.Label();
             this.lblMenuTitle = new System.Windows.Forms.Label();
+            this.lblGreeting = new System.Windows.Forms.Label();
+            this.lblTime = new System.Windows.Forms.Label();
+            this.clockTimer = new System.Windows.Forms.Timer(this.components);
             this.fadeTimer = new System.Windows.Forms.Timer(this.components);
             this.sidebarPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
@@ -162,7 +170,7 @@ namespace RestaurantDesktopApp
             // 
             // picLogo
             // 
-            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\Resources\logo.png"));
+            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\..\Resources\logo.png"));
             this.picLogo.Location = new System.Drawing.Point(10, 15);
             this.picLogo.Name = "picLogo";
             this.picLogo.Size = new System.Drawing.Size(50, 50);
@@ -172,13 +180,39 @@ namespace RestaurantDesktopApp
             // 
             // headerPanel
             // 
-            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(188)))), ((int)(((byte)(156)))));
+            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(39)))), ((int)(((byte)(174)))), ((int)(((byte)(96)))));
+            this.headerPanel.Controls.Add(this.lblTime);
+            this.headerPanel.Controls.Add(this.lblGreeting);
             this.headerPanel.Controls.Add(this.lblPanelTitle);
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.headerPanel.Location = new System.Drawing.Point(220, 0);
             this.headerPanel.Name = "headerPanel";
             this.headerPanel.Size = new System.Drawing.Size(780, 70);
             this.headerPanel.TabIndex = 2;
+            // 
+            // lblTime
+            // 
+            this.lblTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTime.AutoSize = true;
+            this.lblTime.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTime.ForeColor = System.Drawing.Color.White;
+            this.lblTime.Location = new System.Drawing.Point(600, 35);
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(76, 21);
+            this.lblTime.TabIndex = 2;
+            this.lblTime.Text = "00:00:00";
+            // 
+            // lblGreeting
+            // 
+            this.lblGreeting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblGreeting.AutoSize = true;
+            this.lblGreeting.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular);
+            this.lblGreeting.ForeColor = System.Drawing.Color.White;
+            this.lblGreeting.Location = new System.Drawing.Point(600, 15);
+            this.lblGreeting.Name = "lblGreeting";
+            this.lblGreeting.Size = new System.Drawing.Size(95, 19);
+            this.lblGreeting.TabIndex = 1;
+            this.lblGreeting.Text = "Good Morning";
             // 
             // lblPanelTitle
             // 
@@ -194,12 +228,21 @@ namespace RestaurantDesktopApp
             // mainPanel
             // 
             this.mainPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            this.mainPanel.Controls.Add(this.contentPanel);
             this.mainPanel.Controls.Add(this.statsPanel);
             this.mainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainPanel.Location = new System.Drawing.Point(220, 70);
             this.mainPanel.Name = "mainPanel";
             this.mainPanel.Size = new System.Drawing.Size(780, 530);
             this.mainPanel.TabIndex = 1;
+            // 
+            // contentPanel
+            // 
+            this.contentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.contentPanel.Location = new System.Drawing.Point(0, 150);
+            this.contentPanel.Name = "contentPanel";
+            this.contentPanel.Size = new System.Drawing.Size(780, 380);
+            this.contentPanel.TabIndex = 1;
             // 
             // statsPanel
             // 

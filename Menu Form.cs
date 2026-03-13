@@ -121,7 +121,7 @@ namespace RestaurantDesktopApp
                 {
                     // Copy file to Resources if it's not already there
                     string fileName = Path.GetFileName(ofd.FileName);
-                    string targetPath = Path.Combine(Application.StartupPath, @"..\..\Resources", fileName);
+                    string targetPath = Path.Combine(Application.StartupPath, @"..\..\..\Resources", fileName);
                     
                     try {
                         if (!File.Exists(targetPath))
@@ -143,7 +143,8 @@ namespace RestaurantDesktopApp
                 txtItemName.Text = row.Cells["Name"].Value.ToString();
                 txtPrice.Text = row.Cells["Price"].Value.ToString();
                 txtCategory.Text = row.Cells["Category"].Value.ToString();
-                txtImagePath.Text = row.Cells["ImagePath"].Value.ToString();
+                if (row.Cells["ImagePath"].Value != null)
+                    txtImagePath.Text = row.Cells["ImagePath"].Value.ToString();
             }
         }
 

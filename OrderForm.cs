@@ -88,9 +88,11 @@ namespace RestaurantDesktopApp
                     pic.Location = new Point(10, 10);
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
                     
-                    string imgPath = dr["ImagePath"].ToString();
-                    string fullPath = Path.Combine(Application.StartupPath, @"..\..\", imgPath);
-                    if (File.Exists(fullPath))
+                    string imgPath = "";
+                    try { imgPath = dr["ImagePath"].ToString(); } catch { }
+                    
+                    string fullPath = Path.Combine(Application.StartupPath, @"..\..\..\", imgPath);
+                    if (!string.IsNullOrEmpty(imgPath) && File.Exists(fullPath))
                         pic.Image = Image.FromFile(fullPath);
                     else
                         pic.BackColor = Color.LightGray; // Placeholder
@@ -119,7 +121,7 @@ namespace RestaurantDesktopApp
                     btnAdd.Cursor = Cursors.Hand;
                     
                     int id = Convert.ToInt32(dr["ItemID"]);
-                    string name = dr["Name"].ToString();
+                    string name = dr["Name"]?.ToString() ?? "Unknown";
                     decimal price = Convert.ToDecimal(dr["Price"]);
                     
                     btnAdd.Click += (s, ev) => AddToOrder(id, name, price);
@@ -130,6 +132,10 @@ namespace RestaurantDesktopApp
                     card.Controls.Add(btnAdd);
 
                     flpMenu.Controls.Add(card);
+                    
+                    // Apply rounding after adding to parent so handle is created
+                    UIHelper.SetRoundedRegion(card, 15);
+                    UIHelper.ApplyModernButton(btnAdd, Color.FromArgb(39, 174, 96));
                 }
                 dr.Close();
                 con.Close();

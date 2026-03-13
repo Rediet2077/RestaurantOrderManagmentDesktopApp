@@ -12,12 +12,15 @@ namespace RestaurantDesktopApp
         private System.Windows.Forms.Label lblPassword;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label lblWelcome;
-        private System.Windows.Forms.Panel headerPanel;
-        private System.Windows.Forms.Panel loginCard;
+        private System.Windows.Forms.Panel navBar;
+        private System.Windows.Forms.Panel loginPanel;
+        private System.Windows.Forms.Panel heroPanel;
         private System.Windows.Forms.PictureBox picBackground;
         private System.Windows.Forms.PictureBox picLogo;
         private System.Windows.Forms.LinkLabel lnkRegister;
+        private System.Windows.Forms.Button btnShowLogin;
         private System.Windows.Forms.Timer fadeTimer;
+        private System.Windows.Forms.Label lblHeroText;
 
         protected override void Dispose(bool disposing)
         {
@@ -31,40 +34,61 @@ namespace RestaurantDesktopApp
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.lblPassword = new System.Windows.Forms.Label();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.lblWelcome = new System.Windows.Forms.Label();
-            this.headerPanel = new System.Windows.Forms.Panel();
+            this.navBar = new System.Windows.Forms.Panel();
+            this.btnShowLogin = new System.Windows.Forms.Button();
             this.picLogo = new System.Windows.Forms.PictureBox();
-            this.loginCard = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.heroPanel = new System.Windows.Forms.Panel();
+            this.lblHeroText = new System.Windows.Forms.Label();
+            this.lblWelcome = new System.Windows.Forms.Label();
+            this.loginPanel = new System.Windows.Forms.Panel();
             this.lnkRegister = new System.Windows.Forms.LinkLabel();
+            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnLogin = new System.Windows.Forms.Button();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.lblUsername = new System.Windows.Forms.Label();
+            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.txtUsername = new System.Windows.Forms.TextBox();
             this.picBackground = new System.Windows.Forms.PictureBox();
             this.fadeTimer = new System.Windows.Forms.Timer(this.components);
-            this.headerPanel.SuspendLayout();
+            this.navBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
-            this.loginCard.SuspendLayout();
+            this.heroPanel.SuspendLayout();
+            this.loginPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBackground)).BeginInit();
             this.SuspendLayout();
             // 
-            // headerPanel
+            // navBar
             // 
-            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.headerPanel.Controls.Add(this.picLogo);
-            this.headerPanel.Controls.Add(this.lblTitle);
-            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.headerPanel.Location = new System.Drawing.Point(0, 0);
-            this.headerPanel.Name = "headerPanel";
-            this.headerPanel.Size = new System.Drawing.Size(900, 80);
-            this.headerPanel.TabIndex = 0;
+            this.navBar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.navBar.Controls.Add(this.btnShowLogin);
+            this.navBar.Controls.Add(this.picLogo);
+            this.navBar.Controls.Add(this.lblTitle);
+            this.navBar.Dock = System.Windows.Forms.DockStyle.Top;
+            this.navBar.Location = new System.Drawing.Point(0, 0);
+            this.navBar.Name = "navBar";
+            this.navBar.Size = new System.Drawing.Size(1000, 80);
+            this.navBar.TabIndex = 0;
+            // 
+            // btnShowLogin
+            // 
+            this.btnShowLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.btnShowLogin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnShowLogin.FlatAppearance.BorderSize = 0;
+            this.btnShowLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnShowLogin.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.btnShowLogin.ForeColor = System.Drawing.Color.White;
+            this.btnShowLogin.Location = new System.Drawing.Point(860, 20);
+            this.btnShowLogin.Name = "btnShowLogin";
+            this.btnShowLogin.Size = new System.Drawing.Size(110, 40);
+            this.btnShowLogin.TabIndex = 8;
+            this.btnShowLogin.Text = "LOG IN";
+            this.btnShowLogin.UseVisualStyleBackColor = false;
+            this.btnShowLogin.Click += new System.EventHandler(this.btnShowLogin_Click);
             // 
             // picLogo
             // 
-            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\Resources\logo.png"));
+            this.picLogo.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\..\Resources\logo.png"));
             this.picLogo.Location = new System.Drawing.Point(20, 10);
             this.picLogo.Name = "picLogo";
             this.picLogo.Size = new System.Drawing.Size(60, 60);
@@ -75,74 +99,89 @@ namespace RestaurantDesktopApp
             // lblTitle
             // 
             this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 20F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI Black", 18F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.Location = new System.Drawing.Point(90, 22);
+            this.lblTitle.Location = new System.Drawing.Point(90, 24);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(359, 37);
+            this.lblTitle.Size = new System.Drawing.Size(183, 32);
             this.lblTitle.TabIndex = 6;
-            this.lblTitle.Text = "PREMIUM RESTAURANT APP";
+            this.lblTitle.Text = "GASTRO TECH";
             // 
-            // loginCard
+            // heroPanel
             // 
-            this.loginCard.BackColor = System.Drawing.Color.White;
-            this.loginCard.Controls.Add(this.lblWelcome);
-            this.loginCard.Controls.Add(this.lnkRegister);
-            this.loginCard.Controls.Add(this.btnCancel);
-            this.loginCard.Controls.Add(this.btnLogin);
-            this.loginCard.Controls.Add(this.lblPassword);
-            this.loginCard.Controls.Add(this.lblUsername);
-            this.loginCard.Controls.Add(this.txtPassword);
-            this.loginCard.Controls.Add(this.txtUsername);
-            this.loginCard.Location = new System.Drawing.Point(400, 150);
-            this.loginCard.Name = "loginCard";
-            this.loginCard.Size = new System.Drawing.Size(400, 350);
-            this.loginCard.TabIndex = 1;
+            this.heroPanel.BackColor = System.Drawing.Color.Transparent;
+            this.heroPanel.Controls.Add(this.lblHeroText);
+            this.heroPanel.Controls.Add(this.lblWelcome);
+            this.heroPanel.Location = new System.Drawing.Point(50, 120); // Relative to picBackground
+            this.heroPanel.Name = "heroPanel";
+            this.heroPanel.Size = new System.Drawing.Size(500, 200);
+            this.heroPanel.TabIndex = 3;
+            // 
+            // lblHeroText
+            // 
+            this.lblHeroText.AutoSize = true;
+            this.lblHeroText.Font = new System.Drawing.Font("Segoe UI", 14F);
+            this.lblHeroText.ForeColor = System.Drawing.Color.White;
+            this.lblHeroText.Location = new System.Drawing.Point(10, 80);
+            this.lblHeroText.Name = "lblHeroText";
+            this.lblHeroText.Size = new System.Drawing.Size(370, 25);
+            this.lblHeroText.TabIndex = 8;
+            this.lblHeroText.Text = "Experience Gourmet Excellence every day.";
             // 
             // lblWelcome
             // 
             this.lblWelcome.AutoSize = true;
-            this.lblWelcome.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.lblWelcome.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.lblWelcome.Location = new System.Drawing.Point(40, 20);
+            this.lblWelcome.Font = new System.Drawing.Font("Segoe UI Black", 36F, System.Drawing.FontStyle.Bold);
+            this.lblWelcome.ForeColor = System.Drawing.Color.White;
+            this.lblWelcome.Location = new System.Drawing.Point(0, 0);
             this.lblWelcome.Name = "lblWelcome";
-            this.lblWelcome.Size = new System.Drawing.Size(250, 30);
+            this.lblWelcome.Size = new System.Drawing.Size(430, 65);
             this.lblWelcome.TabIndex = 7;
-            this.lblWelcome.Text = "Welcome to Restaurant";
+            this.lblWelcome.Text = "Welcome to Our Restaurant!";
+            // 
+            // loginPanel
+            // 
+            this.loginPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.loginPanel.Controls.Add(this.lnkRegister);
+            this.loginPanel.Controls.Add(this.btnCancel);
+            this.loginPanel.Controls.Add(this.btnLogin);
+            this.loginPanel.Controls.Add(this.lblPassword);
+            this.loginPanel.Controls.Add(this.lblUsername);
+            this.loginPanel.Controls.Add(this.txtPassword);
+            this.loginPanel.Controls.Add(this.txtUsername);
+            this.loginPanel.Location = new System.Drawing.Point(580, 70); // Relative to picBackground
+            this.loginPanel.Name = "loginPanel";
+            this.loginPanel.Size = new System.Drawing.Size(350, 320);
+            this.loginPanel.TabIndex = 1;
+            this.loginPanel.Visible = false;
             // 
             // lnkRegister
             // 
             this.lnkRegister.AutoSize = true;
-            this.lnkRegister.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lnkRegister.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.lnkRegister.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
-            this.lnkRegister.Location = new System.Drawing.Point(130, 290);
+            this.lnkRegister.Location = new System.Drawing.Point(110, 275);
             this.lnkRegister.Name = "lnkRegister";
-            this.lnkRegister.Size = new System.Drawing.Size(142, 20);
+            this.lnkRegister.Size = new System.Drawing.Size(134, 19);
             this.lnkRegister.TabIndex = 6;
             this.lnkRegister.TabStop = true;
             this.lnkRegister.Text = "Create New Account";
             this.lnkRegister.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkRegister_LinkClicked);
             // 
-            // txtUsername
+            // btnCancel
             // 
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
-            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.txtUsername.Location = new System.Drawing.Point(40, 90);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(320, 29);
-            this.txtUsername.TabIndex = 0;
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
-            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 12F);
-            this.txtPassword.Location = new System.Drawing.Point(40, 160);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '●';
-            this.txtPassword.Size = new System.Drawing.Size(320, 29);
-            this.txtPassword.TabIndex = 1;
+            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(189)))), ((int)(((byte)(195)))), ((int)(((byte)(199)))));
+            this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCancel.FlatAppearance.BorderSize = 0;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
+            this.btnCancel.Location = new System.Drawing.Point(185, 210);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(125, 45);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "CLOSE";
+            this.btnCancel.UseVisualStyleBackColor = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // btnLogin
             // 
@@ -150,61 +189,66 @@ namespace RestaurantDesktopApp
             this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnLogin.FlatAppearance.BorderSize = 0;
             this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
             this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(40, 220);
+            this.btnLogin.Location = new System.Drawing.Point(40, 210);
             this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(150, 45);
+            this.btnLogin.Size = new System.Drawing.Size(125, 45);
             this.btnLogin.TabIndex = 2;
-            this.btnLogin.Text = "Log In";
+            this.btnLogin.Text = "LOG IN";
             this.btnLogin.UseVisualStyleBackColor = false;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
-            this.btnCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnCancel.FlatAppearance.BorderSize = 0;
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(210, 220);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(150, 45);
-            this.btnCancel.TabIndex = 3;
-            this.btnCancel.Text = "Exit App";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
-            // lblUsername
-            // 
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
-            this.lblUsername.Location = new System.Drawing.Point(40, 65);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(84, 20);
-            this.lblUsername.TabIndex = 4;
-            this.lblUsername.Text = "Username:";
             // 
             // lblPassword
             // 
             this.lblPassword.AutoSize = true;
-            this.lblPassword.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.lblPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
-            this.lblPassword.Location = new System.Drawing.Point(40, 135);
+            this.lblPassword.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.lblPassword.Location = new System.Drawing.Point(40, 125);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(80, 20);
+            this.lblPassword.Size = new System.Drawing.Size(71, 19);
             this.lblPassword.TabIndex = 5;
-            this.lblPassword.Text = "Password:";
+            this.lblPassword.Text = "Password";
+            // 
+            // lblUsername
+            // 
+            this.lblUsername.AutoSize = true;
+            this.lblUsername.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.lblUsername.Location = new System.Drawing.Point(40, 55);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(74, 19);
+            this.lblUsername.TabIndex = 4;
+            this.lblUsername.Text = "Username";
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.BackColor = System.Drawing.Color.White;
+            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.txtPassword.Location = new System.Drawing.Point(40, 150);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '●';
+            this.txtPassword.Size = new System.Drawing.Size(270, 29);
+            this.txtPassword.TabIndex = 1;
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.BackColor = System.Drawing.Color.White;
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtUsername.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.txtUsername.Location = new System.Drawing.Point(40, 80);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(270, 29);
+            this.txtUsername.TabIndex = 0;
             // 
             // picBackground
             // 
+            this.picBackground.Controls.Add(this.loginPanel);
+            this.picBackground.Controls.Add(this.heroPanel);
             this.picBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picBackground.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\Resources\background.png"));
+            this.picBackground.Image = System.Drawing.Image.FromFile(System.IO.Path.Combine(Application.StartupPath, @"..\..\..\Resources\background.png"));
             this.picBackground.Location = new System.Drawing.Point(0, 80);
             this.picBackground.Name = "picBackground";
-            this.picBackground.Size = new System.Drawing.Size(900, 520);
+            this.picBackground.Size = new System.Drawing.Size(1000, 520);
             this.picBackground.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picBackground.TabIndex = 2;
             this.picBackground.TabStop = false;
@@ -218,21 +262,22 @@ namespace RestaurantDesktopApp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 600);
-            this.Controls.Add(this.loginCard);
+            this.ClientSize = new System.Drawing.Size(1000, 600);
             this.Controls.Add(this.picBackground);
-            this.Controls.Add(this.headerPanel);
+            this.Controls.Add(this.navBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "LoginForm";
             this.Opacity = 0D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Welcome to Restaurant";
+            this.Text = "Welcome Page";
             this.Load += new System.EventHandler(this.LoginForm_Load);
-            this.headerPanel.ResumeLayout(false);
-            this.headerPanel.PerformLayout();
+            this.navBar.ResumeLayout(false);
+            this.navBar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
-            this.loginCard.ResumeLayout(false);
-            this.loginCard.PerformLayout();
+            this.heroPanel.ResumeLayout(false);
+            this.heroPanel.PerformLayout();
+            this.loginPanel.ResumeLayout(false);
+            this.loginPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBackground)).EndInit();
             this.ResumeLayout(false);
 

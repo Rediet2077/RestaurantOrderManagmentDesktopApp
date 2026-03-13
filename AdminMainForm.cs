@@ -18,6 +18,29 @@ namespace RestaurantDesktopApp
         {
             fadeTimer.Start();
             LoadStats();
+            ApplyStyles();
+        }
+
+        private void ApplyStyles()
+        {
+            UIHelper.ApplyModernButton(btnManageMenu, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnReports, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnStaff, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnSettings, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnLogout, Color.FromArgb(231, 76, 60)); // Brighter red on hover
+            
+            lblGreeting.Text = $"{UIHelper.GetGreeting()}, Admin";
+            lblTime.Text = DateTime.Now.ToString("T");
+
+            // Rounded cards
+            UIHelper.SetRoundedRegion(cardRevenue, 15);
+            UIHelper.SetRoundedRegion(cardOrders, 15);
+            UIHelper.SetRoundedRegion(cardTables, 15);
+        }
+
+        private void clockTimer_Tick(object sender, EventArgs e)
+        {
+            lblTime.Text = DateTime.Now.ToString("T");
         }
 
         private void fadeTimer_Tick(object sender, EventArgs e)
@@ -79,14 +102,25 @@ namespace RestaurantDesktopApp
             login.Show();
         }
 
+        private void btnStaff_Click(object sender, EventArgs e)
+        {
+            LoadForm(new StaffForm());
+            lblPanelTitle.Text = "Staff management & Access Control";
+        }
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            LoadForm(new SettingsForm());
+            lblPanelTitle.Text = "System Configuration";
+        }
+
         private void LoadForm(Form form)
         {
-            mainPanel.Controls.Clear();
-            mainPanel.Controls.Add(statsPanel); // Keep stats at top if desired, or clear it
+            contentPanel.Controls.Clear();
             
             form.TopLevel = false;
             form.Dock = DockStyle.Fill;
-            mainPanel.Controls.Add(form);
+            contentPanel.Controls.Add(form);
             form.Show();
         }
     }

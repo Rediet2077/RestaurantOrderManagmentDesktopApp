@@ -18,6 +18,28 @@ namespace RestaurantDesktopApp
         {
             fadeTimer.Start();
             LoadStats();
+            ApplyStyles();
+        }
+
+        private void ApplyStyles()
+        {
+            UIHelper.ApplyModernButton(btnCreateOrder, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnManageTables, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnPayments, UIHelper.ControlColor);
+            UIHelper.ApplyModernButton(btnLogout, Color.FromArgb(231, 76, 60));
+            
+            lblGreeting.Text = $"{UIHelper.GetGreeting()}, Staff";
+            lblTime.Text = DateTime.Now.ToString("T");
+
+            // Rounded cards
+            UIHelper.SetRoundedRegion(cardTables, 15);
+            UIHelper.SetRoundedRegion(cardPending, 15);
+            UIHelper.SetRoundedRegion(cardMenu, 15);
+        }
+
+        private void clockTimer_Tick(object sender, EventArgs e)
+        {
+            lblTime.Text = DateTime.Now.ToString("T");
         }
 
         private void fadeTimer_Tick(object sender, EventArgs e)
@@ -85,12 +107,11 @@ namespace RestaurantDesktopApp
 
         private void LoadForm(Form form)
         {
-            mainPanel.Controls.Clear();
-            mainPanel.Controls.Add(statsPanel);
+            contentPanel.Controls.Clear();
             
             form.TopLevel = false;
             form.Dock = DockStyle.Fill;
-            mainPanel.Controls.Add(form);
+            contentPanel.Controls.Add(form);
             form.Show();
         }
     }

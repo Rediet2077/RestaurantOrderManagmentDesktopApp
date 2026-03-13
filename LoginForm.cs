@@ -18,6 +18,15 @@ namespace RestaurantDesktopApp
         private void LoginForm_Load(object sender, EventArgs e)
         {
             fadeTimer.Start();
+            ApplyStyles();
+        }
+
+        private void ApplyStyles()
+        {
+            UIHelper.SetRoundedRegion(loginPanel, 20);
+            UIHelper.ApplyModernButton(btnShowLogin, Color.FromArgb(52, 152, 219));
+            UIHelper.ApplyModernButton(btnLogin, Color.FromArgb(52, 152, 219));
+            UIHelper.ApplyModernButton(btnCancel, Color.FromArgb(149, 165, 166));
         }
 
         private void fadeTimer_Tick(object sender, EventArgs e)
@@ -26,6 +35,22 @@ namespace RestaurantDesktopApp
                 this.Opacity += 0.05;
             else
                 fadeTimer.Stop();
+        }
+
+        private void btnShowLogin_Click(object sender, EventArgs e)
+        {
+            // Toggle Login Panel
+            loginPanel.Visible = !loginPanel.Visible;
+            if (loginPanel.Visible)
+            {
+                heroPanel.Visible = false;
+                btnShowLogin.Text = "BACK";
+            }
+            else
+            {
+                heroPanel.Visible = true;
+                btnShowLogin.Text = "LOG IN";
+            }
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -78,13 +103,15 @@ namespace RestaurantDesktopApp
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            loginPanel.Visible = false;
+            heroPanel.Visible = true;
+            btnShowLogin.Text = "LOG IN";
         }
 
         private void lnkRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             RegisterForm regForm = new RegisterForm();
-            regForm.ShowDialog(); // Show as modal so user returns here after registration
+            regForm.ShowDialog();
         }
     }
 }
