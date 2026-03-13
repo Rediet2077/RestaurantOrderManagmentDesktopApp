@@ -9,7 +9,7 @@ namespace RestaurantDesktopApp
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new Main_Form__Dashboard_());
+            Application.Run(new LoginForm());
         }
     }
 }

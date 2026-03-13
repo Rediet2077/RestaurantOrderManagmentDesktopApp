@@ -17,6 +17,8 @@ namespace RestaurantDesktopApp
         private Label lblTotal;
         private Label lblTotalAmount;
         private Button btnPlaceOrder;
+        private Panel headerPanel;
+        private Label lblTitle;
 
         protected override void Dispose(bool disposing)
         {
@@ -29,112 +31,237 @@ namespace RestaurantDesktopApp
 
         private void InitializeComponent()
         {
-            lblTable = new Label();
-            cmbTables = new ComboBox();
-            lblCustomer = new Label();
-            cmbCustomers = new ComboBox();
-            lblMenuItem = new Label();
-            cmbMenuItems = new ComboBox();
-            lblQuantity = new Label();
-            numQuantity = new NumericUpDown();
-            btnAddItem = new Button();
-            dgvOrderDetails = new DataGridView();
-            lblTotal = new Label();
-            lblTotalAmount = new Label();
-            btnPlaceOrder = new Button();
-
-            ((System.ComponentModel.ISupportInitialize)(numQuantity)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(dgvOrderDetails)).BeginInit();
-            SuspendLayout();
-
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.lblTable = new System.Windows.Forms.Label();
+            this.cmbTables = new System.Windows.Forms.ComboBox();
+            this.lblCustomer = new System.Windows.Forms.Label();
+            this.cmbCustomers = new System.Windows.Forms.ComboBox();
+            this.lblMenuItem = new System.Windows.Forms.Label();
+            this.cmbMenuItems = new System.Windows.Forms.ComboBox();
+            this.lblQuantity = new System.Windows.Forms.Label();
+            this.numQuantity = new System.Windows.Forms.NumericUpDown();
+            this.btnAddItem = new System.Windows.Forms.Button();
+            this.dgvOrderDetails = new System.Windows.Forms.DataGridView();
+            this.lblTotal = new System.Windows.Forms.Label();
+            this.lblTotalAmount = new System.Windows.Forms.Label();
+            this.btnPlaceOrder = new System.Windows.Forms.Button();
+            this.headerPanel = new System.Windows.Forms.Panel();
+            this.lblTitle = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.numQuantity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvOrderDetails)).BeginInit();
+            this.headerPanel.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // headerPanel
+            // 
+            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(22)))), ((int)(((byte)(160)))), ((int)(((byte)(133)))));
+            this.headerPanel.Controls.Add(this.lblTitle);
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Location = new System.Drawing.Point(0, 0);
+            this.headerPanel.Name = "headerPanel";
+            this.headerPanel.Size = new System.Drawing.Size(780, 60);
+            this.headerPanel.TabIndex = 13;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(20, 15);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(145, 30);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Create Order";
+            // 
             // lblTable
-            lblTable.Text = "Table:";
-            lblTable.Location = new System.Drawing.Point(20, 20);
-            lblTable.Size = new System.Drawing.Size(100, 23);
-
+            // 
+            this.lblTable.AutoSize = true;
+            this.lblTable.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblTable.Location = new System.Drawing.Point(30, 80);
+            this.lblTable.Name = "lblTable";
+            this.lblTable.Size = new System.Drawing.Size(48, 19);
+            this.lblTable.TabIndex = 0;
+            this.lblTable.Text = "Table:";
+            // 
             // cmbTables
-            cmbTables.Location = new System.Drawing.Point(120, 20);
-            cmbTables.Size = new System.Drawing.Size(150, 23);
-
+            // 
+            this.cmbTables.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbTables.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cmbTables.Location = new System.Drawing.Point(120, 77);
+            this.cmbTables.Name = "cmbTables";
+            this.cmbTables.Size = new System.Drawing.Size(150, 25);
+            this.cmbTables.TabIndex = 1;
+            // 
             // lblCustomer
-            lblCustomer.Text = "Customer:";
-            lblCustomer.Location = new System.Drawing.Point(20, 50);
-            lblCustomer.Size = new System.Drawing.Size(100, 23);
-
+            // 
+            this.lblCustomer.AutoSize = true;
+            this.lblCustomer.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblCustomer.Location = new System.Drawing.Point(300, 80);
+            this.lblCustomer.Name = "lblCustomer";
+            this.lblCustomer.Size = new System.Drawing.Size(78, 19);
+            this.lblCustomer.TabIndex = 2;
+            this.lblCustomer.Text = "Customer:";
+            // 
             // cmbCustomers
-            cmbCustomers.Location = new System.Drawing.Point(120, 50);
-            cmbCustomers.Size = new System.Drawing.Size(150, 23);
-
+            // 
+            this.cmbCustomers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCustomers.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cmbCustomers.Location = new System.Drawing.Point(390, 77);
+            this.cmbCustomers.Name = "cmbCustomers";
+            this.cmbCustomers.Size = new System.Drawing.Size(150, 25);
+            this.cmbCustomers.TabIndex = 3;
+            // 
             // lblMenuItem
-            lblMenuItem.Text = "Menu Item:";
-            lblMenuItem.Location = new System.Drawing.Point(20, 90);
-            lblMenuItem.Size = new System.Drawing.Size(100, 23);
-
+            // 
+            this.lblMenuItem.AutoSize = true;
+            this.lblMenuItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblMenuItem.Location = new System.Drawing.Point(30, 120);
+            this.lblMenuItem.Name = "lblMenuItem";
+            this.lblMenuItem.Size = new System.Drawing.Size(86, 19);
+            this.lblMenuItem.TabIndex = 4;
+            this.lblMenuItem.Text = "Menu Item:";
+            // 
             // cmbMenuItems
-            cmbMenuItems.Location = new System.Drawing.Point(120, 90);
-            cmbMenuItems.Size = new System.Drawing.Size(150, 23);
-
+            // 
+            this.cmbMenuItems.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbMenuItems.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cmbMenuItems.Location = new System.Drawing.Point(120, 117);
+            this.cmbMenuItems.Name = "cmbMenuItems";
+            this.cmbMenuItems.Size = new System.Drawing.Size(150, 25);
+            this.cmbMenuItems.TabIndex = 5;
+            // 
             // lblQuantity
-            lblQuantity.Text = "Quantity:";
-            lblQuantity.Location = new System.Drawing.Point(280, 90);
-            lblQuantity.Size = new System.Drawing.Size(60, 23);
-
+            // 
+            this.lblQuantity.AutoSize = true;
+            this.lblQuantity.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblQuantity.Location = new System.Drawing.Point(300, 120);
+            this.lblQuantity.Name = "lblQuantity";
+            this.lblQuantity.Size = new System.Drawing.Size(71, 19);
+            this.lblQuantity.TabIndex = 6;
+            this.lblQuantity.Text = "Quantity:";
+            // 
             // numQuantity
-            numQuantity.Location = new System.Drawing.Point(340, 90);
-            numQuantity.Size = new System.Drawing.Size(50, 23);
-            numQuantity.Value = 1;
-            numQuantity.Minimum = 1;
-
+            // 
+            this.numQuantity.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.numQuantity.Location = new System.Drawing.Point(390, 118);
+            this.numQuantity.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numQuantity.Name = "numQuantity";
+            this.numQuantity.Size = new System.Drawing.Size(60, 25);
+            this.numQuantity.TabIndex = 7;
+            this.numQuantity.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // btnAddItem
-            btnAddItem.Text = "Add to Order";
-            btnAddItem.Location = new System.Drawing.Point(400, 88);
-            btnAddItem.Size = new System.Drawing.Size(100, 30);
-            btnAddItem.Click += btnAddItem_Click;
-
+            // 
+            this.btnAddItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(204)))), ((int)(((byte)(113)))));
+            this.btnAddItem.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddItem.FlatAppearance.BorderSize = 0;
+            this.btnAddItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnAddItem.ForeColor = System.Drawing.Color.White;
+            this.btnAddItem.Location = new System.Drawing.Point(470, 115);
+            this.btnAddItem.Name = "btnAddItem";
+            this.btnAddItem.Size = new System.Drawing.Size(120, 30);
+            this.btnAddItem.TabIndex = 8;
+            this.btnAddItem.Text = "Add to Order";
+            this.btnAddItem.UseVisualStyleBackColor = false;
+            this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click);
+            // 
             // dgvOrderDetails
-            dgvOrderDetails.Location = new System.Drawing.Point(20, 130);
-            dgvOrderDetails.Size = new System.Drawing.Size(550, 200);
-            dgvOrderDetails.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
+            // 
+            this.dgvOrderDetails.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvOrderDetails.BackgroundColor = System.Drawing.Color.White;
+            this.dgvOrderDetails.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(188)))), ((int)(((byte)(156)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvOrderDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvOrderDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvOrderDetails.EnableHeadersVisualStyles = false;
+            this.dgvOrderDetails.Location = new System.Drawing.Point(30, 160);
+            this.dgvOrderDetails.Name = "dgvOrderDetails";
+            this.dgvOrderDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvOrderDetails.Size = new System.Drawing.Size(720, 280);
+            this.dgvOrderDetails.TabIndex = 9;
+            // 
             // lblTotal
-            lblTotal.Text = "Total Amount:";
-            lblTotal.Location = new System.Drawing.Point(380, 340);
-            lblTotal.Size = new System.Drawing.Size(100, 23);
-            lblTotal.Font = new System.Drawing.Font(lblTotal.Font, System.Drawing.FontStyle.Bold);
-
+            // 
+            this.lblTotal.AutoSize = true;
+            this.lblTotal.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.lblTotal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblTotal.Location = new System.Drawing.Point(30, 470);
+            this.lblTotal.Name = "lblTotal";
+            this.lblTotal.Size = new System.Drawing.Size(142, 25);
+            this.lblTotal.TabIndex = 10;
+            this.lblTotal.Text = "Total Amount:";
+            // 
             // lblTotalAmount
-            lblTotalAmount.Text = "0.00";
-            lblTotalAmount.Location = new System.Drawing.Point(480, 340);
-            lblTotalAmount.Size = new System.Drawing.Size(100, 23);
-            lblTotalAmount.Font = new System.Drawing.Font(lblTotalAmount.Font, System.Drawing.FontStyle.Bold);
-
+            // 
+            this.lblTotalAmount.AutoSize = true;
+            this.lblTotalAmount.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.lblTotalAmount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(57)))), ((int)(((byte)(43)))));
+            this.lblTotalAmount.Location = new System.Drawing.Point(180, 470);
+            this.lblTotalAmount.Name = "lblTotalAmount";
+            this.lblTotalAmount.Size = new System.Drawing.Size(50, 25);
+            this.lblTotalAmount.TabIndex = 11;
+            this.lblTotalAmount.Text = "0.00";
+            // 
             // btnPlaceOrder
-            btnPlaceOrder.Text = "Place Order";
-            btnPlaceOrder.Location = new System.Drawing.Point(450, 380);
-            btnPlaceOrder.Size = new System.Drawing.Size(120, 35);
-            btnPlaceOrder.Click += btnPlaceOrder_Click;
-
+            // 
+            this.btnPlaceOrder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(41)))), ((int)(((byte)(128)))), ((int)(((byte)(185)))));
+            this.btnPlaceOrder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnPlaceOrder.FlatAppearance.BorderSize = 0;
+            this.btnPlaceOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPlaceOrder.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnPlaceOrder.ForeColor = System.Drawing.Color.White;
+            this.btnPlaceOrder.Location = new System.Drawing.Point(600, 465);
+            this.btnPlaceOrder.Name = "btnPlaceOrder";
+            this.btnPlaceOrder.Size = new System.Drawing.Size(150, 40);
+            this.btnPlaceOrder.TabIndex = 12;
+            this.btnPlaceOrder.Text = "Place Order";
+            this.btnPlaceOrder.UseVisualStyleBackColor = false;
+            this.btnPlaceOrder.Click += new System.EventHandler(this.btnPlaceOrder_Click);
+            // 
             // OrderForm
-            ClientSize = new System.Drawing.Size(600, 440);
-            Controls.Add(lblTable);
-            Controls.Add(cmbTables);
-            Controls.Add(lblCustomer);
-            Controls.Add(cmbCustomers);
-            Controls.Add(lblMenuItem);
-            Controls.Add(cmbMenuItems);
-            Controls.Add(lblQuantity);
-            Controls.Add(numQuantity);
-            Controls.Add(btnAddItem);
-            Controls.Add(dgvOrderDetails);
-            Controls.Add(lblTotal);
-            Controls.Add(lblTotalAmount);
-            Controls.Add(btnPlaceOrder);
-            Text = "Create Order";
-
-            ((System.ComponentModel.ISupportInitialize)(numQuantity)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(dgvOrderDetails)).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            this.ClientSize = new System.Drawing.Size(780, 530);
+            this.Controls.Add(this.btnPlaceOrder);
+            this.Controls.Add(this.lblTotalAmount);
+            this.Controls.Add(this.lblTotal);
+            this.Controls.Add(this.dgvOrderDetails);
+            this.Controls.Add(this.btnAddItem);
+            this.Controls.Add(this.numQuantity);
+            this.Controls.Add(this.lblQuantity);
+            this.Controls.Add(this.cmbMenuItems);
+            this.Controls.Add(this.lblMenuItem);
+            this.Controls.Add(this.cmbCustomers);
+            this.Controls.Add(this.lblCustomer);
+            this.Controls.Add(this.cmbTables);
+            this.Controls.Add(this.lblTable);
+            this.Controls.Add(this.headerPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Name = "OrderForm";
+            this.Text = "Create Order";
+            ((System.ComponentModel.ISupportInitialize)(this.numQuantity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvOrderDetails)).EndInit();
+            this.headerPanel.ResumeLayout(false);
+            this.headerPanel.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
     }
 }

@@ -15,6 +15,7 @@ namespace RestaurantDesktopApp
         private Button btnUpdateItem;
         private Button btnDeleteItem;
         private DataGridView dgvMenuItems;
+        private Panel headerPanel;
 
         protected override void Dispose(bool disposing)
         {
@@ -27,96 +28,198 @@ namespace RestaurantDesktopApp
 
         private void InitializeComponent()
         {
-            lblTitle = new Label();
-            lblItemName = new Label();
-            lblPrice = new Label();
-            lblCategory = new Label();
-            txtItemName = new TextBox();
-            txtPrice = new TextBox();
-            txtCategory = new TextBox();
-            btnAddItem = new Button();
-            btnUpdateItem = new Button();
-            btnDeleteItem = new Button();
-            dgvMenuItems = new DataGridView();
-
-            ((System.ComponentModel.ISupportInitialize)(dgvMenuItems)).BeginInit();
-            SuspendLayout();
-
-            // Title
-            lblTitle.AutoSize = true;
-            lblTitle.Text = "Menu Management Form";
-            lblTitle.Location = new System.Drawing.Point(200, 10);
-
-            // Item Name Label
-            lblItemName.AutoSize = true;
-            lblItemName.Text = "Item Name";
-            lblItemName.Location = new System.Drawing.Point(50, 60);
-
-            // Item Name TextBox
-            txtItemName.Location = new System.Drawing.Point(150, 60);
-            txtItemName.Size = new System.Drawing.Size(200, 23);
-
-            // Price Label
-            lblPrice.AutoSize = true;
-            lblPrice.Text = "Price";
-            lblPrice.Location = new System.Drawing.Point(50, 100);
-
-            // Price TextBox
-            txtPrice.Location = new System.Drawing.Point(150, 100);
-            txtPrice.Size = new System.Drawing.Size(200, 23);
-
-            // Category Label
-            lblCategory.AutoSize = true;
-            lblCategory.Text = "Category";
-            lblCategory.Location = new System.Drawing.Point(50, 140);
-
-            // Category TextBox
-            txtCategory.Location = new System.Drawing.Point(150, 140);
-            txtCategory.Size = new System.Drawing.Size(200, 23);
-
-            // Add Button
-            btnAddItem.Text = "Add Item";
-            btnAddItem.Location = new System.Drawing.Point(50, 180);
-            btnAddItem.Size = new System.Drawing.Size(100, 30);
-            btnAddItem.Click += btnAddItem_Click;
-
-            // Update Button
-            btnUpdateItem.Text = "Update Item";
-            btnUpdateItem.Location = new System.Drawing.Point(160, 180);
-            btnUpdateItem.Size = new System.Drawing.Size(100, 30);
-            btnUpdateItem.Click += btnUpdateItem_Click;
-
-            // Delete Button
-            btnDeleteItem.Text = "Delete Item";
-            btnDeleteItem.Location = new System.Drawing.Point(270, 180);
-            btnDeleteItem.Size = new System.Drawing.Size(100, 30);
-            btnDeleteItem.Click += btnDeleteItem_Click;
-
-            // DataGridView
-            dgvMenuItems.Location = new System.Drawing.Point(50, 230);
-            dgvMenuItems.Size = new System.Drawing.Size(500, 200);
-            dgvMenuItems.Name = "dgvMenuItems";
-
-            // Add Controls
-            Controls.Add(lblTitle);
-            Controls.Add(lblItemName);
-            Controls.Add(txtItemName);
-            Controls.Add(lblPrice);
-            Controls.Add(txtPrice);
-            Controls.Add(lblCategory);
-            Controls.Add(txtCategory);
-            Controls.Add(btnAddItem);
-            Controls.Add(btnUpdateItem);
-            Controls.Add(btnDeleteItem);
-            Controls.Add(dgvMenuItems);
-
-            // Form Settings
-            Text = "Menu Form";
-            ClientSize = new System.Drawing.Size(620, 460);
-
-            ((System.ComponentModel.ISupportInitialize)(dgvMenuItems)).EndInit();
-            ResumeLayout(false);
-            PerformLayout();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.lblItemName = new System.Windows.Forms.Label();
+            this.lblPrice = new System.Windows.Forms.Label();
+            this.lblCategory = new System.Windows.Forms.Label();
+            this.txtItemName = new System.Windows.Forms.TextBox();
+            this.txtPrice = new System.Windows.Forms.TextBox();
+            this.txtCategory = new System.Windows.Forms.TextBox();
+            this.btnAddItem = new System.Windows.Forms.Button();
+            this.btnUpdateItem = new System.Windows.Forms.Button();
+            this.btnDeleteItem = new System.Windows.Forms.Button();
+            this.dgvMenuItems = new System.Windows.Forms.DataGridView();
+            this.headerPanel = new System.Windows.Forms.Panel();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMenuItems)).BeginInit();
+            this.headerPanel.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // headerPanel
+            // 
+            this.headerPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
+            this.headerPanel.Controls.Add(this.lblTitle);
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Location = new System.Drawing.Point(0, 0);
+            this.headerPanel.Name = "headerPanel";
+            this.headerPanel.Size = new System.Drawing.Size(780, 60);
+            this.headerPanel.TabIndex = 12;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
+            this.lblTitle.Location = new System.Drawing.Point(20, 15);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(220, 30);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Menu Management";
+            // 
+            // lblItemName
+            // 
+            this.lblItemName.AutoSize = true;
+            this.lblItemName.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblItemName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblItemName.Location = new System.Drawing.Point(30, 85);
+            this.lblItemName.Name = "lblItemName";
+            this.lblItemName.Size = new System.Drawing.Size(81, 19);
+            this.lblItemName.TabIndex = 1;
+            this.lblItemName.Text = "Item Name";
+            // 
+            // txtItemName
+            // 
+            this.txtItemName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtItemName.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtItemName.Location = new System.Drawing.Point(120, 81);
+            this.txtItemName.Name = "txtItemName";
+            this.txtItemName.Size = new System.Drawing.Size(200, 27);
+            this.txtItemName.TabIndex = 4;
+            // 
+            // lblPrice
+            // 
+            this.lblPrice.AutoSize = true;
+            this.lblPrice.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblPrice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblPrice.Location = new System.Drawing.Point(30, 125);
+            this.lblPrice.Name = "lblPrice";
+            this.lblPrice.Size = new System.Drawing.Size(43, 19);
+            this.lblPrice.TabIndex = 2;
+            this.lblPrice.Text = "Price";
+            // 
+            // txtPrice
+            // 
+            this.txtPrice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPrice.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtPrice.Location = new System.Drawing.Point(120, 121);
+            this.txtPrice.Name = "txtPrice";
+            this.txtPrice.Size = new System.Drawing.Size(200, 27);
+            this.txtPrice.TabIndex = 5;
+            // 
+            // lblCategory
+            // 
+            this.lblCategory.AutoSize = true;
+            this.lblCategory.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblCategory.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblCategory.Location = new System.Drawing.Point(30, 165);
+            this.lblCategory.Name = "lblCategory";
+            this.lblCategory.Size = new System.Drawing.Size(71, 19);
+            this.lblCategory.TabIndex = 3;
+            this.lblCategory.Text = "Category";
+            // 
+            // txtCategory
+            // 
+            this.txtCategory.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCategory.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.txtCategory.Location = new System.Drawing.Point(120, 161);
+            this.txtCategory.Name = "txtCategory";
+            this.txtCategory.Size = new System.Drawing.Size(200, 27);
+            this.txtCategory.TabIndex = 6;
+            // 
+            // btnAddItem
+            // 
+            this.btnAddItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(204)))), ((int)(((byte)(113)))));
+            this.btnAddItem.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAddItem.FlatAppearance.BorderSize = 0;
+            this.btnAddItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnAddItem.ForeColor = System.Drawing.Color.White;
+            this.btnAddItem.Location = new System.Drawing.Point(340, 80);
+            this.btnAddItem.Name = "btnAddItem";
+            this.btnAddItem.Size = new System.Drawing.Size(120, 35);
+            this.btnAddItem.TabIndex = 7;
+            this.btnAddItem.Text = "Add Item";
+            this.btnAddItem.UseVisualStyleBackColor = false;
+            this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click);
+            // 
+            // btnUpdateItem
+            // 
+            this.btnUpdateItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.btnUpdateItem.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnUpdateItem.FlatAppearance.BorderSize = 0;
+            this.btnUpdateItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUpdateItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnUpdateItem.ForeColor = System.Drawing.Color.White;
+            this.btnUpdateItem.Location = new System.Drawing.Point(340, 120);
+            this.btnUpdateItem.Name = "btnUpdateItem";
+            this.btnUpdateItem.Size = new System.Drawing.Size(120, 35);
+            this.btnUpdateItem.TabIndex = 8;
+            this.btnUpdateItem.Text = "Update Item";
+            this.btnUpdateItem.UseVisualStyleBackColor = false;
+            this.btnUpdateItem.Click += new System.EventHandler(this.btnUpdateItem_Click);
+            // 
+            // btnDeleteItem
+            // 
+            this.btnDeleteItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(76)))), ((int)(((byte)(60)))));
+            this.btnDeleteItem.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDeleteItem.FlatAppearance.BorderSize = 0;
+            this.btnDeleteItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDeleteItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.btnDeleteItem.ForeColor = System.Drawing.Color.White;
+            this.btnDeleteItem.Location = new System.Drawing.Point(340, 160);
+            this.btnDeleteItem.Name = "btnDeleteItem";
+            this.btnDeleteItem.Size = new System.Drawing.Size(120, 35);
+            this.btnDeleteItem.TabIndex = 9;
+            this.btnDeleteItem.Text = "Delete Item";
+            this.btnDeleteItem.UseVisualStyleBackColor = false;
+            this.btnDeleteItem.Click += new System.EventHandler(this.btnDeleteItem_Click);
+            // 
+            // dgvMenuItems
+            // 
+            this.dgvMenuItems.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvMenuItems.BackgroundColor = System.Drawing.Color.White;
+            this.dgvMenuItems.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgvMenuItems.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvMenuItems.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvMenuItems.EnableHeadersVisualStyles = false;
+            this.dgvMenuItems.Location = new System.Drawing.Point(30, 220);
+            this.dgvMenuItems.Name = "dgvMenuItems";
+            this.dgvMenuItems.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvMenuItems.Size = new System.Drawing.Size(720, 280);
+            this.dgvMenuItems.TabIndex = 11;
+            // 
+            // Menu_Form
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            this.ClientSize = new System.Drawing.Size(780, 530);
+            this.Controls.Add(this.dgvMenuItems);
+            this.Controls.Add(this.btnDeleteItem);
+            this.Controls.Add(this.btnUpdateItem);
+            this.Controls.Add(this.btnAddItem);
+            this.Controls.Add(this.txtCategory);
+            this.Controls.Add(this.lblCategory);
+            this.Controls.Add(this.txtPrice);
+            this.Controls.Add(this.lblPrice);
+            this.Controls.Add(this.txtItemName);
+            this.Controls.Add(this.lblItemName);
+            this.Controls.Add(this.headerPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Name = "Menu_Form";
+            this.Text = "Menu Form";
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMenuItems)).EndInit();
+            this.headerPanel.ResumeLayout(false);
+            this.headerPanel.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
         }
     }
 }
