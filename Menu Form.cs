@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using System.IO;
 
 namespace RestaurantDesktopApp
 {
@@ -24,11 +25,12 @@ namespace RestaurantDesktopApp
                 con.Open();
 
                 MySqlCommand cmd = new MySqlCommand(
-                "INSERT INTO MenuItems(Name,Price,Category) VALUES(@n,@p,@c)", con);
+                "INSERT INTO MenuItems(Name,Price,Category,ImagePath) VALUES(@n,@p,@c,@img)", con);
 
                 cmd.Parameters.AddWithValue("@n", txtItemName.Text);
                 cmd.Parameters.AddWithValue("@p", txtPrice.Text);
                 cmd.Parameters.AddWithValue("@c", txtCategory.Text);
+                cmd.Parameters.AddWithValue("@img", txtImagePath.Text);
 
                 cmd.ExecuteNonQuery();
                 con.Close();
@@ -54,10 +56,11 @@ namespace RestaurantDesktopApp
                     int id = Convert.ToInt32(dgvMenuItems.SelectedRows[0].Cells["ItemID"].Value);
                     con.Open();
                     MySqlCommand cmd = new MySqlCommand(
-                        "UPDATE MenuItems SET Name=@n, Price=@p, Category=@c WHERE ItemID=@id", con);
+                        "UPDATE MenuItems SET Name=@n, Price=@p, Category=@c, ImagePath=@img WHERE ItemID=@id", con);
                     cmd.Parameters.AddWithValue("@n", txtItemName.Text);
                     cmd.Parameters.AddWithValue("@p", txtPrice.Text);
                     cmd.Parameters.AddWithValue("@c", txtCategory.Text);
+                    cmd.Parameters.AddWithValue("@img", txtImagePath.Text);
                     cmd.Parameters.AddWithValue("@id", id);
 
                     cmd.ExecuteNonQuery();
@@ -109,6 +112,29 @@ namespace RestaurantDesktopApp
             }
         }
 
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    // Copy file to Resources if it's not already there
+                    string fileName = Path.GetFileName(ofd.FileName);
+                    string targetPath = Path.Combine(Application.StartupPath, @"..\..\Resources", fileName);
+                    
+                    try {
+                        if (!File.Exists(targetPath))
+                            File.Copy(ofd.FileName, targetPath);
+                        
+                        txtImagePath.Text = "Resources/" + fileName;
+                    } catch (Exception ex) {
+                        MessageBox.Show("Error copying image: " + ex.Message);
+                    }
+                }
+            }
+        }
+
         private void dgvMenuItems_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -117,6 +143,7 @@ namespace RestaurantDesktopApp
                 txtItemName.Text = row.Cells["Name"].Value.ToString();
                 txtPrice.Text = row.Cells["Price"].Value.ToString();
                 txtCategory.Text = row.Cells["Category"].Value.ToString();
+                txtImagePath.Text = row.Cells["ImagePath"].Value.ToString();
             }
         }
 
@@ -125,6 +152,7 @@ namespace RestaurantDesktopApp
             txtItemName.Clear();
             txtPrice.Clear();
             txtCategory.Clear();
+            txtImagePath.Clear();
         }
 
         private void LoadMenuItems()

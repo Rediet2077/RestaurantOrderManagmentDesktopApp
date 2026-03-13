@@ -15,6 +15,19 @@ namespace RestaurantDesktopApp
             InitializeComponent();
         }
 
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            fadeTimer.Start();
+        }
+
+        private void fadeTimer_Tick(object sender, EventArgs e)
+        {
+            if (this.Opacity < 1)
+                this.Opacity += 0.05;
+            else
+                fadeTimer.Stop();
+        }
+
         private void btnLogin_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtUsername.Text) || string.IsNullOrEmpty(txtPassword.Text))
@@ -66,6 +79,12 @@ namespace RestaurantDesktopApp
         private void btnCancel_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void lnkRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            RegisterForm regForm = new RegisterForm();
+            regForm.ShowDialog(); // Show as modal so user returns here after registration
         }
     }
 }

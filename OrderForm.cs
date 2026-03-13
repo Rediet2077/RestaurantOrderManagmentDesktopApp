@@ -3,13 +3,13 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
+using System.IO;
 
 namespace RestaurantDesktopApp
 {
     public partial class OrderForm : Form
     {
-        MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
+         MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
         DataTable orderDetailsTable = new DataTable();
         decimal totalAmount = 0;
 
@@ -19,7 +19,7 @@ namespace RestaurantDesktopApp
             SetupOrderDetailsTable();
             LoadTables();
             LoadCustomers();
-            LoadMenuItems();
+            LoadMenuCards();
         }
 
         private void SetupOrderDetailsTable()
@@ -36,7 +36,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                MySqlDataAdapter da = new MySqlDataAdapter("SELECT TableID, Status FROM Tables WHERE Status = 'Available'", con);
+                MySqlDataAdapter da = new MySqlDataAdapter("SELECT TableID FROM Tables WHERE Status = 'Available'", con);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 cmbTables.DataSource = dt;
@@ -54,7 +54,6 @@ namespace RestaurantDesktopApp
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 
-                // Add a default "Walk-in" customer if none exist or as an option
                 DataRow dr = dt.NewRow();
                 dr["CustomerID"] = DBNull.Value;
                 dr["Name"] = "Walk-in";
@@ -67,34 +66,97 @@ namespace RestaurantDesktopApp
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void LoadMenuItems()
+        private void LoadMenuCards()
         {
+            flpMenu.Controls.Clear();
             try
             {
-                MySqlDataAdapter da = new MySqlDataAdapter("SELECT ItemID, Name, Price FROM MenuItems", con);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                cmbMenuItems.DataSource = dt;
-                cmbMenuItems.DisplayMember = "Name";
-                cmbMenuItems.ValueMember = "ItemID";
+                con.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM MenuItems", con);
+                MySqlDataReader dr = cmd.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    Panel card = new Panel();
+                    card.Size = new Size(130, 180);
+                    card.BackColor = Color.White;
+                    card.Margin = new Padding(10);
+                    card.BorderStyle = BorderStyle.FixedSingle;
+
+                    PictureBox pic = new PictureBox();
+                    pic.Size = new Size(110, 80);
+                    pic.Location = new Point(10, 10);
+                    pic.SizeMode = PictureBoxSizeMode.Zoom;
+                    
+                    string imgPath = dr["ImagePath"].ToString();
+                    string fullPath = Path.Combine(Application.StartupPath, @"..\..\", imgPath);
+                    if (File.Exists(fullPath))
+                        pic.Image = Image.FromFile(fullPath);
+                    else
+                        pic.BackColor = Color.LightGray; // Placeholder
+
+                    Label lblName = new Label();
+                    lblName.Text = dr["Name"].ToString();
+                    lblName.Location = new Point(10, 100);
+                    lblName.Size = new Size(110, 20);
+                    lblName.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+                    lblName.TextAlign = ContentAlignment.MiddleCenter;
+
+                    Label lblPrice = new Label();
+                    lblPrice.Text = "$" + dr["Price"].ToString();
+                    lblPrice.Location = new Point(10, 120);
+                    lblPrice.Size = new Size(110, 20);
+                    lblPrice.ForeColor = Color.DarkGreen;
+                    lblPrice.TextAlign = ContentAlignment.MiddleCenter;
+
+                    Button btnAdd = new Button();
+                    btnAdd.Text = "+ Add";
+                    btnAdd.Location = new Point(20, 145);
+                    btnAdd.Size = new Size(90, 25);
+                    btnAdd.FlatStyle = FlatStyle.Flat;
+                    btnAdd.BackColor = Color.FromArgb(46, 204, 113);
+                    btnAdd.ForeColor = Color.White;
+                    btnAdd.Cursor = Cursors.Hand;
+                    
+                    int id = Convert.ToInt32(dr["ItemID"]);
+                    string name = dr["Name"].ToString();
+                    decimal price = Convert.ToDecimal(dr["Price"]);
+                    
+                    btnAdd.Click += (s, ev) => AddToOrder(id, name, price);
+
+                    card.Controls.Add(pic);
+                    card.Controls.Add(lblName);
+                    card.Controls.Add(lblPrice);
+                    card.Controls.Add(btnAdd);
+
+                    flpMenu.Controls.Add(card);
+                }
+                dr.Close();
+                con.Close();
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex)
+            {
+                con.Close();
+                MessageBox.Show(ex.Message);
+            }
         }
 
-        private void btnAddItem_Click(object sender, EventArgs e)
+        private void AddToOrder(int itemId, string itemName, decimal price)
         {
-            if (cmbMenuItems.SelectedValue != null)
+            // Check if item already exists in order
+            foreach (DataRow row in orderDetailsTable.Rows)
             {
-                DataRowView selectedItem = (DataRowView)cmbMenuItems.SelectedItem;
-                int itemId = Convert.ToInt32(selectedItem["ItemID"]);
-                string itemName = selectedItem["Name"].ToString();
-                decimal price = Convert.ToDecimal(selectedItem["Price"]);
-                int quantity = (int)numQuantity.Value;
-                decimal subtotal = price * quantity;
-
-                orderDetailsTable.Rows.Add(itemId, itemName, quantity, price, subtotal);
-                UpdateTotalAmount();
+                if (Convert.ToInt32(row["ItemID"]) == itemId)
+                {
+                    row["Quantity"] = Convert.ToInt32(row["Quantity"]) + 1;
+                    row["Subtotal"] = Convert.ToDecimal(row["Quantity"]) * price;
+                    UpdateTotalAmount();
+                    return;
+                }
             }
+
+            orderDetailsTable.Rows.Add(itemId, itemName, 1, price, price);
+            UpdateTotalAmount();
         }
 
         private void UpdateTotalAmount()
@@ -114,25 +176,28 @@ namespace RestaurantDesktopApp
                 MessageBox.Show("Please add items to the order.");
                 return;
             }
+            if (cmbTables.SelectedValue == null)
+            {
+                MessageBox.Show("Please select a table.");
+                return;
+            }
 
             try
             {
                 con.Open();
                 MySqlTransaction trans = con.BeginTransaction();
-
                 try
                 {
-                    // 1. Insert Order
                     MySqlCommand cmdOrder = new MySqlCommand(
-                        "INSERT INTO Orders (CustomerID, TableID, TotalAmount, Status) VALUES (@cid, @tid, @total, 'Pending'); SELECT LAST_INSERT_ID();", con, trans);
+                        "INSERT INTO Orders (CustomerID, TableID, TotalAmount, Status) VALUES (@cid, @tid, @total, @status); SELECT LAST_INSERT_ID();", con, trans);
                     
                     cmdOrder.Parameters.AddWithValue("@cid", cmbCustomers.SelectedValue ?? DBNull.Value);
                     cmdOrder.Parameters.AddWithValue("@tid", cmbTables.SelectedValue);
                     cmdOrder.Parameters.AddWithValue("@total", totalAmount);
+                    cmdOrder.Parameters.AddWithValue("@status", "Pending");
 
                     int orderId = Convert.ToInt32(cmdOrder.ExecuteScalar());
 
-                    // 2. Insert Order Details
                     foreach (DataRow row in orderDetailsTable.Rows)
                     {
                         MySqlCommand cmdDetail = new MySqlCommand(
@@ -144,7 +209,6 @@ namespace RestaurantDesktopApp
                         cmdDetail.ExecuteNonQuery();
                     }
 
-                    // 3. Update Table Status
                     MySqlCommand cmdTable = new MySqlCommand("UPDATE Tables SET Status = 'Occupied' WHERE TableID = @tid", con, trans);
                     cmdTable.Parameters.AddWithValue("@tid", cmbTables.SelectedValue);
                     cmdTable.ExecuteNonQuery();
@@ -158,15 +222,9 @@ namespace RestaurantDesktopApp
                     trans.Rollback();
                     MessageBox.Show("Transaction failed: " + ex.Message);
                 }
-                finally
-                {
-                    con.Close();
-                }
+                finally { con.Close(); }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
     }
 }

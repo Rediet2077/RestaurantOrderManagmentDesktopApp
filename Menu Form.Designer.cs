@@ -8,12 +8,15 @@ namespace RestaurantDesktopApp
         private Label lblItemName;
         private Label lblPrice;
         private Label lblCategory;
+        private Label lblImagePath;
         private TextBox txtItemName;
         private TextBox txtPrice;
         private TextBox txtCategory;
+        private TextBox txtImagePath;
         private Button btnAddItem;
         private Button btnUpdateItem;
         private Button btnDeleteItem;
+        private Button btnBrowse;
         private DataGridView dgvMenuItems;
         private Panel headerPanel;
 
@@ -33,12 +36,15 @@ namespace RestaurantDesktopApp
             this.lblItemName = new System.Windows.Forms.Label();
             this.lblPrice = new System.Windows.Forms.Label();
             this.lblCategory = new System.Windows.Forms.Label();
+            this.lblImagePath = new System.Windows.Forms.Label();
             this.txtItemName = new System.Windows.Forms.TextBox();
             this.txtPrice = new System.Windows.Forms.TextBox();
             this.txtCategory = new System.Windows.Forms.TextBox();
+            this.txtImagePath = new System.Windows.Forms.TextBox();
             this.btnAddItem = new System.Windows.Forms.Button();
             this.btnUpdateItem = new System.Windows.Forms.Button();
             this.btnDeleteItem = new System.Windows.Forms.Button();
+            this.btnBrowse = new System.Windows.Forms.Button();
             this.dgvMenuItems = new System.Windows.Forms.DataGridView();
             this.headerPanel = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMenuItems)).BeginInit();
@@ -71,7 +77,7 @@ namespace RestaurantDesktopApp
             this.lblItemName.AutoSize = true;
             this.lblItemName.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblItemName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.lblItemName.Location = new System.Drawing.Point(30, 85);
+            this.lblItemName.Location = new System.Drawing.Point(30, 75);
             this.lblItemName.Name = "lblItemName";
             this.lblItemName.Size = new System.Drawing.Size(81, 19);
             this.lblItemName.TabIndex = 1;
@@ -80,10 +86,10 @@ namespace RestaurantDesktopApp
             // txtItemName
             // 
             this.txtItemName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtItemName.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtItemName.Location = new System.Drawing.Point(120, 81);
+            this.txtItemName.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtItemName.Location = new System.Drawing.Point(120, 71);
             this.txtItemName.Name = "txtItemName";
-            this.txtItemName.Size = new System.Drawing.Size(200, 27);
+            this.txtItemName.Size = new System.Drawing.Size(180, 25);
             this.txtItemName.TabIndex = 4;
             // 
             // lblPrice
@@ -91,7 +97,7 @@ namespace RestaurantDesktopApp
             this.lblPrice.AutoSize = true;
             this.lblPrice.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblPrice.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.lblPrice.Location = new System.Drawing.Point(30, 125);
+            this.lblPrice.Location = new System.Drawing.Point(30, 110);
             this.lblPrice.Name = "lblPrice";
             this.lblPrice.Size = new System.Drawing.Size(43, 19);
             this.lblPrice.TabIndex = 2;
@@ -100,10 +106,10 @@ namespace RestaurantDesktopApp
             // txtPrice
             // 
             this.txtPrice.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtPrice.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtPrice.Location = new System.Drawing.Point(120, 121);
+            this.txtPrice.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtPrice.Location = new System.Drawing.Point(120, 106);
             this.txtPrice.Name = "txtPrice";
-            this.txtPrice.Size = new System.Drawing.Size(200, 27);
+            this.txtPrice.Size = new System.Drawing.Size(180, 25);
             this.txtPrice.TabIndex = 5;
             // 
             // lblCategory
@@ -111,7 +117,7 @@ namespace RestaurantDesktopApp
             this.lblCategory.AutoSize = true;
             this.lblCategory.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblCategory.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.lblCategory.Location = new System.Drawing.Point(30, 165);
+            this.lblCategory.Location = new System.Drawing.Point(30, 145);
             this.lblCategory.Name = "lblCategory";
             this.lblCategory.Size = new System.Drawing.Size(71, 19);
             this.lblCategory.TabIndex = 3;
@@ -120,11 +126,44 @@ namespace RestaurantDesktopApp
             // txtCategory
             // 
             this.txtCategory.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtCategory.Font = new System.Drawing.Font("Segoe UI", 11F);
-            this.txtCategory.Location = new System.Drawing.Point(120, 161);
+            this.txtCategory.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtCategory.Location = new System.Drawing.Point(120, 141);
             this.txtCategory.Name = "txtCategory";
-            this.txtCategory.Size = new System.Drawing.Size(200, 27);
+            this.txtCategory.Size = new System.Drawing.Size(180, 25);
             this.txtCategory.TabIndex = 6;
+            // 
+            // lblImagePath
+            // 
+            this.lblImagePath.AutoSize = true;
+            this.lblImagePath.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblImagePath.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblImagePath.Location = new System.Drawing.Point(30, 180);
+            this.lblImagePath.Name = "lblImagePath";
+            this.lblImagePath.Size = new System.Drawing.Size(83, 19);
+            this.lblImagePath.TabIndex = 13;
+            this.lblImagePath.Text = "Image Path";
+            // 
+            // txtImagePath
+            // 
+            this.txtImagePath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtImagePath.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.txtImagePath.Location = new System.Drawing.Point(120, 176);
+            this.txtImagePath.Name = "txtImagePath";
+            this.txtImagePath.Size = new System.Drawing.Size(130, 25);
+            this.txtImagePath.TabIndex = 14;
+            // 
+            // btnBrowse
+            // 
+            this.btnBrowse.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(149)))), ((int)(((byte)(165)))), ((int)(((byte)(166)))));
+            this.btnBrowse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowse.ForeColor = System.Drawing.Color.White;
+            this.btnBrowse.Location = new System.Drawing.Point(255, 176);
+            this.btnBrowse.Name = "btnBrowse";
+            this.btnBrowse.Size = new System.Drawing.Size(45, 25);
+            this.btnBrowse.TabIndex = 15;
+            this.btnBrowse.Text = "...";
+            this.btnBrowse.UseVisualStyleBackColor = false;
+            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // btnAddItem
             // 
@@ -134,11 +173,11 @@ namespace RestaurantDesktopApp
             this.btnAddItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnAddItem.ForeColor = System.Drawing.Color.White;
-            this.btnAddItem.Location = new System.Drawing.Point(340, 80);
+            this.btnAddItem.Location = new System.Drawing.Point(320, 71);
             this.btnAddItem.Name = "btnAddItem";
-            this.btnAddItem.Size = new System.Drawing.Size(120, 35);
+            this.btnAddItem.Size = new System.Drawing.Size(100, 30);
             this.btnAddItem.TabIndex = 7;
-            this.btnAddItem.Text = "Add Item";
+            this.btnAddItem.Text = "Add";
             this.btnAddItem.UseVisualStyleBackColor = false;
             this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click);
             // 
@@ -150,11 +189,11 @@ namespace RestaurantDesktopApp
             this.btnUpdateItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpdateItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnUpdateItem.ForeColor = System.Drawing.Color.White;
-            this.btnUpdateItem.Location = new System.Drawing.Point(340, 120);
+            this.btnUpdateItem.Location = new System.Drawing.Point(320, 106);
             this.btnUpdateItem.Name = "btnUpdateItem";
-            this.btnUpdateItem.Size = new System.Drawing.Size(120, 35);
+            this.btnUpdateItem.Size = new System.Drawing.Size(100, 30);
             this.btnUpdateItem.TabIndex = 8;
-            this.btnUpdateItem.Text = "Update Item";
+            this.btnUpdateItem.Text = "Update";
             this.btnUpdateItem.UseVisualStyleBackColor = false;
             this.btnUpdateItem.Click += new System.EventHandler(this.btnUpdateItem_Click);
             // 
@@ -166,11 +205,11 @@ namespace RestaurantDesktopApp
             this.btnDeleteItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnDeleteItem.ForeColor = System.Drawing.Color.White;
-            this.btnDeleteItem.Location = new System.Drawing.Point(340, 160);
+            this.btnDeleteItem.Location = new System.Drawing.Point(320, 141);
             this.btnDeleteItem.Name = "btnDeleteItem";
-            this.btnDeleteItem.Size = new System.Drawing.Size(120, 35);
+            this.btnDeleteItem.Size = new System.Drawing.Size(100, 30);
             this.btnDeleteItem.TabIndex = 9;
-            this.btnDeleteItem.Text = "Delete Item";
+            this.btnDeleteItem.Text = "Delete";
             this.btnDeleteItem.UseVisualStyleBackColor = false;
             this.btnDeleteItem.Click += new System.EventHandler(this.btnDeleteItem_Click);
             // 
@@ -201,6 +240,9 @@ namespace RestaurantDesktopApp
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
             this.ClientSize = new System.Drawing.Size(780, 530);
+            this.Controls.Add(this.btnBrowse);
+            this.Controls.Add(this.txtImagePath);
+            this.Controls.Add(this.lblImagePath);
             this.Controls.Add(this.dgvMenuItems);
             this.Controls.Add(this.btnDeleteItem);
             this.Controls.Add(this.btnUpdateItem);

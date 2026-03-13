@@ -8,17 +8,14 @@ namespace RestaurantDesktopApp
         private ComboBox cmbTables;
         private Label lblCustomer;
         private ComboBox cmbCustomers;
-        private Label lblMenuItem;
-        private ComboBox cmbMenuItems;
-        private Label lblQuantity;
-        private NumericUpDown numQuantity;
-        private Button btnAddItem;
         private DataGridView dgvOrderDetails;
         private Label lblTotal;
         private Label lblTotalAmount;
         private Button btnPlaceOrder;
         private Panel headerPanel;
         private Label lblTitle;
+        private System.Windows.Forms.FlowLayoutPanel flpMenu;
+        private Label lblMenuTitle;
 
         protected override void Dispose(bool disposing)
         {
@@ -36,18 +33,14 @@ namespace RestaurantDesktopApp
             this.cmbTables = new System.Windows.Forms.ComboBox();
             this.lblCustomer = new System.Windows.Forms.Label();
             this.cmbCustomers = new System.Windows.Forms.ComboBox();
-            this.lblMenuItem = new System.Windows.Forms.Label();
-            this.cmbMenuItems = new System.Windows.Forms.ComboBox();
-            this.lblQuantity = new System.Windows.Forms.Label();
-            this.numQuantity = new System.Windows.Forms.NumericUpDown();
-            this.btnAddItem = new System.Windows.Forms.Button();
             this.dgvOrderDetails = new System.Windows.Forms.DataGridView();
             this.lblTotal = new System.Windows.Forms.Label();
             this.lblTotalAmount = new System.Windows.Forms.Label();
             this.btnPlaceOrder = new System.Windows.Forms.Button();
             this.headerPanel = new System.Windows.Forms.Panel();
             this.lblTitle = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.numQuantity)).BeginInit();
+            this.flpMenu = new System.Windows.Forms.FlowLayoutPanel();
+            this.lblMenuTitle = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOrderDetails)).BeginInit();
             this.headerPanel.SuspendLayout();
             this.SuspendLayout();
@@ -59,7 +52,7 @@ namespace RestaurantDesktopApp
             this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.headerPanel.Location = new System.Drawing.Point(0, 0);
             this.headerPanel.Name = "headerPanel";
-            this.headerPanel.Size = new System.Drawing.Size(780, 60);
+            this.headerPanel.Size = new System.Drawing.Size(1000, 60);
             this.headerPanel.TabIndex = 13;
             // 
             // lblTitle
@@ -87,16 +80,16 @@ namespace RestaurantDesktopApp
             // 
             this.cmbTables.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTables.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cmbTables.Location = new System.Drawing.Point(120, 77);
+            this.cmbTables.Location = new System.Drawing.Point(90, 77);
             this.cmbTables.Name = "cmbTables";
-            this.cmbTables.Size = new System.Drawing.Size(150, 25);
+            this.cmbTables.Size = new System.Drawing.Size(120, 25);
             this.cmbTables.TabIndex = 1;
             // 
             // lblCustomer
             // 
             this.lblCustomer.AutoSize = true;
             this.lblCustomer.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblCustomer.Location = new System.Drawing.Point(300, 80);
+            this.lblCustomer.Location = new System.Drawing.Point(230, 80);
             this.lblCustomer.Name = "lblCustomer";
             this.lblCustomer.Size = new System.Drawing.Size(78, 19);
             this.lblCustomer.TabIndex = 2;
@@ -106,73 +99,30 @@ namespace RestaurantDesktopApp
             // 
             this.cmbCustomers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbCustomers.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cmbCustomers.Location = new System.Drawing.Point(390, 77);
+            this.cmbCustomers.Location = new System.Drawing.Point(315, 77);
             this.cmbCustomers.Name = "cmbCustomers";
             this.cmbCustomers.Size = new System.Drawing.Size(150, 25);
             this.cmbCustomers.TabIndex = 3;
             // 
-            // lblMenuItem
+            // flpMenu
             // 
-            this.lblMenuItem.AutoSize = true;
-            this.lblMenuItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblMenuItem.Location = new System.Drawing.Point(30, 120);
-            this.lblMenuItem.Name = "lblMenuItem";
-            this.lblMenuItem.Size = new System.Drawing.Size(86, 19);
-            this.lblMenuItem.TabIndex = 4;
-            this.lblMenuItem.Text = "Menu Item:";
+            this.flpMenu.AutoScroll = true;
+            this.flpMenu.BackColor = System.Drawing.Color.White;
+            this.flpMenu.Location = new System.Drawing.Point(30, 140);
+            this.flpMenu.Name = "flpMenu";
+            this.flpMenu.Size = new System.Drawing.Size(435, 380);
+            this.flpMenu.TabIndex = 14;
             // 
-            // cmbMenuItems
+            // lblMenuTitle
             // 
-            this.cmbMenuItems.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbMenuItems.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cmbMenuItems.Location = new System.Drawing.Point(120, 117);
-            this.cmbMenuItems.Name = "cmbMenuItems";
-            this.cmbMenuItems.Size = new System.Drawing.Size(150, 25);
-            this.cmbMenuItems.TabIndex = 5;
-            // 
-            // lblQuantity
-            // 
-            this.lblQuantity.AutoSize = true;
-            this.lblQuantity.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblQuantity.Location = new System.Drawing.Point(300, 120);
-            this.lblQuantity.Name = "lblQuantity";
-            this.lblQuantity.Size = new System.Drawing.Size(71, 19);
-            this.lblQuantity.TabIndex = 6;
-            this.lblQuantity.Text = "Quantity:";
-            // 
-            // numQuantity
-            // 
-            this.numQuantity.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.numQuantity.Location = new System.Drawing.Point(390, 118);
-            this.numQuantity.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numQuantity.Name = "numQuantity";
-            this.numQuantity.Size = new System.Drawing.Size(60, 25);
-            this.numQuantity.TabIndex = 7;
-            this.numQuantity.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // btnAddItem
-            // 
-            this.btnAddItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(46)))), ((int)(((byte)(204)))), ((int)(((byte)(113)))));
-            this.btnAddItem.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAddItem.FlatAppearance.BorderSize = 0;
-            this.btnAddItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddItem.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.btnAddItem.ForeColor = System.Drawing.Color.White;
-            this.btnAddItem.Location = new System.Drawing.Point(470, 115);
-            this.btnAddItem.Name = "btnAddItem";
-            this.btnAddItem.Size = new System.Drawing.Size(120, 30);
-            this.btnAddItem.TabIndex = 8;
-            this.btnAddItem.Text = "Add to Order";
-            this.btnAddItem.UseVisualStyleBackColor = false;
-            this.btnAddItem.Click += new System.EventHandler(this.btnAddItem_Click);
+            this.lblMenuTitle.AutoSize = true;
+            this.lblMenuTitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.lblMenuTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
+            this.lblMenuTitle.Location = new System.Drawing.Point(30, 115);
+            this.lblMenuTitle.Name = "lblMenuTitle";
+            this.lblMenuTitle.Size = new System.Drawing.Size(100, 21);
+            this.lblMenuTitle.TabIndex = 15;
+            this.lblMenuTitle.Text = "Select Food";
             // 
             // dgvOrderDetails
             // 
@@ -189,10 +139,10 @@ namespace RestaurantDesktopApp
             this.dgvOrderDetails.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvOrderDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvOrderDetails.EnableHeadersVisualStyles = false;
-            this.dgvOrderDetails.Location = new System.Drawing.Point(30, 160);
+            this.dgvOrderDetails.Location = new System.Drawing.Point(480, 140);
             this.dgvOrderDetails.Name = "dgvOrderDetails";
             this.dgvOrderDetails.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvOrderDetails.Size = new System.Drawing.Size(720, 280);
+            this.dgvOrderDetails.Size = new System.Drawing.Size(490, 310);
             this.dgvOrderDetails.TabIndex = 9;
             // 
             // lblTotal
@@ -200,7 +150,7 @@ namespace RestaurantDesktopApp
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblTotal.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(62)))), ((int)(((byte)(80)))));
-            this.lblTotal.Location = new System.Drawing.Point(30, 470);
+            this.lblTotal.Location = new System.Drawing.Point(480, 465);
             this.lblTotal.Name = "lblTotal";
             this.lblTotal.Size = new System.Drawing.Size(142, 25);
             this.lblTotal.TabIndex = 10;
@@ -211,7 +161,7 @@ namespace RestaurantDesktopApp
             this.lblTotalAmount.AutoSize = true;
             this.lblTotalAmount.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
             this.lblTotalAmount.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(57)))), ((int)(((byte)(43)))));
-            this.lblTotalAmount.Location = new System.Drawing.Point(180, 470);
+            this.lblTotalAmount.Location = new System.Drawing.Point(630, 465);
             this.lblTotalAmount.Name = "lblTotalAmount";
             this.lblTotalAmount.Size = new System.Drawing.Size(50, 25);
             this.lblTotalAmount.TabIndex = 11;
@@ -225,9 +175,9 @@ namespace RestaurantDesktopApp
             this.btnPlaceOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPlaceOrder.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.btnPlaceOrder.ForeColor = System.Drawing.Color.White;
-            this.btnPlaceOrder.Location = new System.Drawing.Point(600, 465);
+            this.btnPlaceOrder.Location = new System.Drawing.Point(820, 460);
             this.btnPlaceOrder.Name = "btnPlaceOrder";
-            this.btnPlaceOrder.Size = new System.Drawing.Size(150, 40);
+            this.btnPlaceOrder.Size = new System.Drawing.Size(150, 45);
             this.btnPlaceOrder.TabIndex = 12;
             this.btnPlaceOrder.Text = "Place Order";
             this.btnPlaceOrder.UseVisualStyleBackColor = false;
@@ -238,16 +188,13 @@ namespace RestaurantDesktopApp
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
-            this.ClientSize = new System.Drawing.Size(780, 530);
+            this.ClientSize = new System.Drawing.Size(1000, 550);
+            this.Controls.Add(this.lblMenuTitle);
+            this.Controls.Add(this.flpMenu);
             this.Controls.Add(this.btnPlaceOrder);
             this.Controls.Add(this.lblTotalAmount);
             this.Controls.Add(this.lblTotal);
             this.Controls.Add(this.dgvOrderDetails);
-            this.Controls.Add(this.btnAddItem);
-            this.Controls.Add(this.numQuantity);
-            this.Controls.Add(this.lblQuantity);
-            this.Controls.Add(this.cmbMenuItems);
-            this.Controls.Add(this.lblMenuItem);
             this.Controls.Add(this.cmbCustomers);
             this.Controls.Add(this.lblCustomer);
             this.Controls.Add(this.cmbTables);
@@ -256,12 +203,12 @@ namespace RestaurantDesktopApp
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "OrderForm";
             this.Text = "Create Order";
-            ((System.ComponentModel.ISupportInitialize)(this.numQuantity)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOrderDetails)).EndInit();
             this.headerPanel.ResumeLayout(false);
             this.headerPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
     }
 }

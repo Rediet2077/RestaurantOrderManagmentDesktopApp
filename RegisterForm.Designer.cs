@@ -188,8 +188,7 @@ namespace RestaurantDesktopApp
             this.lblName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.lblName.Location = new System.Drawing.Point(40, 45);
             this.lblName.Name = "lblName";
-            this.lblName.Size0 = new System.Drawing.Size(53, 19);
-lblName.Size = new System.Drawing.Size(53, 19);
+            this.lblName.Size = new System.Drawing.Size(53, 19);
             this.lblName.TabIndex = 7;
             this.lblName.Text = "Name:";
             // 
@@ -200,8 +199,7 @@ lblName.Size = new System.Drawing.Size(53, 19);
             this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.lblUsername.Location = new System.Drawing.Point(40, 95);
             this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size0 = new System.Drawing.Size(81, 19);
-lblUsername.Size = new System.Drawing.Size(81, 19);
+            this.lblUsername.Size = new System.Drawing.Size(81, 19);
             this.lblUsername.TabIndex = 8;
             this.lblUsername.Text = "Username:";
             // 
@@ -212,8 +210,7 @@ lblUsername.Size = new System.Drawing.Size(81, 19);
             this.lblPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.lblPassword.Location = new System.Drawing.Point(40, 145);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size0 = new System.Drawing.Size(77, 19);
-lblPassword.Size = new System.Drawing.Size(77, 19);
+            this.lblPassword.Size = new System.Drawing.Size(77, 19);
             this.lblPassword.TabIndex = 9;
             this.lblPassword.Text = "Password:";
             // 
@@ -224,8 +221,7 @@ lblPassword.Size = new System.Drawing.Size(77, 19);
             this.lblConfirmPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.lblConfirmPassword.Location = new System.Drawing.Point(40, 195);
             this.lblConfirmPassword.Name = "lblConfirmPassword";
-            this.lblConfirmPassword.Size0 = new System.Drawing.Size(130, 19);
-lblConfirmPassword.Size = new System.Drawing.Size(130, 19);
+            this.lblConfirmPassword.Size = new System.Drawing.Size(130, 19);
             this.lblConfirmPassword.TabIndex = 10;
             this.lblConfirmPassword.Text = "Confirm Password:";
             // 
@@ -236,8 +232,7 @@ lblConfirmPassword.Size = new System.Drawing.Size(130, 19);
             this.lblRole.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(73)))), ((int)(((byte)(94)))));
             this.lblRole.Location = new System.Drawing.Point(40, 245);
             this.lblRole.Name = "lblRole";
-            this.lblRole.Size0 = new System.Drawing.Size(43, 19);
-lblRole.Size = new System.Drawing.Size(43, 19);
+            this.lblRole.Size = new System.Drawing.Size(43, 19);
             this.lblRole.TabIndex = 11;
             this.lblRole.Text = "Role:";
             // 
