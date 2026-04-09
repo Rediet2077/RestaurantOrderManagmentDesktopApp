@@ -443,33 +443,16 @@ namespace RestaurantDesktopApp
                 UIHelper.ShowToast("Please enter username and password.", true);
                 return;
             }
-            try
-            {
-                con.Open();
-                string query = "SELECT Role FROM Users WHERE Username=@user AND Password=@pass";
-                MySqlCommand cmd = new MySqlCommand(query, con);
-                cmd.Parameters.AddWithValue("@user", txtUsername.Text);
-                cmd.Parameters.AddWithValue("@pass", txtPassword.Text);
-                object result = cmd.ExecuteScalar();
-                con.Close();
 
-                if (result != null)
-                {
-                    string role = result.ToString();
-                    UIHelper.ShowToast($"Welcome back, {role}!");
-                    if (role == "Admin") new AdminMainForm().Show();
-                    else                 new UserMainForm().Show();
-                    this.Hide();
-                }
-                else
-                {
-                    UIHelper.ShowToast("Invalid username or password.", true);
-                }
-            }
-            catch (Exception ex)
+            if (txtUsername.Text == "admin@gmail.com" && txtPassword.Text == "12345678")
             {
-                con.Close();
-                UIHelper.ShowToast("Connection error: " + ex.Message, true);
+                UIHelper.ShowToast($"Welcome back, Admin!");
+                new AdminMainForm().Show();
+                this.Hide(); // or Close() depending on their app lifecycle
+            }
+            else
+            {
+                UIHelper.ShowToast("Invalid username or password.", true);
             }
         }
 

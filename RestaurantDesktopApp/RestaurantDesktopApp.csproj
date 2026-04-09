@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="9.6.0" />
+    <!-- Temporarily removed MySql.Data -->
   </ItemGroup>
 
   <ItemGroup>
