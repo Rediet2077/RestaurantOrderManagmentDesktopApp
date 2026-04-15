@@ -1,6 +1,8 @@
 using System;
-using System.Data;
 using System.Drawing;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -117,23 +119,16 @@ namespace RestaurantDesktopApp
             Label t3 = MkLbl("Restaurants", new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(250, 163, 7), new Point(60, 122));
             heroPanel.Controls.AddRange(new Control[] { t1, t2, t3 });
 
-            Label desc = MkLbl("Access affordable meals, track your orders, and\nmanage your contract balance with your student account.",
+            Label desc = MkLbl("Order your favourite meals, track your orders,\nand manage your account with ease.",
                                 new Font("Segoe UI", 12), Color.FromArgb(90, 100, 120), new Point(60, 186));
             heroPanel.Controls.Add(desc);
 
-            string[] feats = { "Student-exclusive discounts", "Easy contract balance management", "Fast delivery across campus", "Order history and tracking" };
+            string[] feats = { "Exclusive member discounts", "Easy balance management", "Fast delivery to your table", "Order history and tracking" };
             for (int i = 0; i < feats.Length; i++)
             {
                 heroPanel.Controls.Add(MkLbl("✓",       new Font("Segoe UI", 12, FontStyle.Bold), Color.FromArgb(34, 197, 94),  new Point(60, 268 + i * 34)));
                 heroPanel.Controls.Add(MkLbl(feats[i],  new Font("Segoe UI", 12),                  Color.FromArgb(17, 24, 39),   new Point(86, 268 + i * 34)));
             }
-
-            // Blue info box
-            Panel infoBox = new Panel { Size = new Size(380, 88), Location = new Point(60, 420), BackColor = Color.FromArgb(235, 244, 255) };
-            infoBox.Paint += (s2, pe) => { using var pen = new System.Drawing.Pen(Color.FromArgb(190, 215, 255), 1); pe.Graphics.DrawRectangle(pen, 0, 0, infoBox.Width - 1, infoBox.Height - 1); };
-            infoBox.Controls.Add(MkLbl("DBU Students Only",                                                      new Font("Segoe UI", 11, FontStyle.Bold), Color.FromArgb(29, 78, 216), new Point(14, 12)));
-            infoBox.Controls.Add(MkLbl("Please use your official DBU email address\n(@dbu.edu.et) to register.", new Font("Segoe UI", 10),                  Color.FromArgb(29, 78, 216), new Point(14, 36)));
-            heroPanel.Controls.Add(infoBox);
 
             // ── Vertical divider that splits left/right ─────────────────
             _divider = new Panel { BackColor = Color.FromArgb(210, 213, 223) };
@@ -174,7 +169,7 @@ namespace RestaurantDesktopApp
                 new Font("Segoe UI", 11), Color.FromArgb(100, 110, 130), new Point(40, 124)));
 
             // ── Email ───────────────────────────────────────────────────
-            loginPanel.Controls.Add(MkLbl("DBU Email Address *",
+            loginPanel.Controls.Add(MkLbl("Email Address *",
                 new Font("Segoe UI", 10, FontStyle.Bold), Color.FromArgb(17, 24, 39), new Point(40, 168)));
             txtUsername.Location = new Point(40, 191); txtUsername.Size = new Size(360, 36);
             txtUsername.Font = new Font("Segoe UI", 12);
@@ -226,7 +221,7 @@ namespace RestaurantDesktopApp
         private void ShowRegisterPanel()
         {
             loginPanel.Controls.Clear();
-            loginPanel.Size = new Size(loginPanel.Width, 620);
+            loginPanel.Size = new Size(loginPanel.Width, 720);
 
             Color accent  = Color.FromArgb(250, 163, 7);
             Color darkTxt = Color.FromArgb(17, 24, 39);
@@ -245,48 +240,98 @@ namespace RestaurantDesktopApp
             loginPanel.Controls.Add(tabReg);
 
             // ── Heading ─────────────────────────────────────────────────
-            loginPanel.Controls.Add(MkLbl("Create Account 🎓",
+            loginPanel.Controls.Add(MkLbl("Create Account",
                 new Font("Segoe UI", 18, FontStyle.Bold), darkTxt, new Point(40, 88)));
-            loginPanel.Controls.Add(MkLbl("Join DBU Restaurants as a student",
+            loginPanel.Controls.Add(MkLbl("Create your account to start ordering",
                 new Font("Segoe UI", 11), midTxt, new Point(40, 124)));
 
             // ── Full Name ────────────────────────────────────────────────
             loginPanel.Controls.Add(MkLbl("Full Name *",
                 new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 162)));
-            var txtFN = MkField("Abebe Kebede", new Point(40, 183), new Size(fw, 36), fieldBg);
+            var txtFN = MkField("e.g. John Smith", new Point(40, 183), new Size(fw, 36), fieldBg);
             loginPanel.Controls.Add(txtFN);
 
-            // ── Student ID  +  Phone Number (side by side) ───────────────
+            // ── Username  +  Phone Number (side by side) ─────────────────
             int halfW = (fw - 14) / 2;
-            loginPanel.Controls.Add(MkLbl("Student ID *",
+            loginPanel.Controls.Add(MkLbl("Username *",
                 new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 233)));
             loginPanel.Controls.Add(MkLbl("Phone Number *",
                 new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40 + halfW + 14, 233)));
-            var txtSID   = MkField("DBU/2024/001",   new Point(40, 254),            new Size(halfW, 36), fieldBg);
-            var txtPhone = MkField("+251912345678",   new Point(40 + halfW + 14, 254), new Size(halfW, 36), fieldBg);
+            var txtSID   = MkField("e.g. john123",      new Point(40, 254),              new Size(halfW, 36), fieldBg);
+            var txtPhone = MkField("e.g. 0912345678",   new Point(40 + halfW + 14, 254), new Size(halfW, 36), fieldBg);
             loginPanel.Controls.Add(txtSID);
             loginPanel.Controls.Add(txtPhone);
 
-            // ── DBU Email ────────────────────────────────────────────────
-            loginPanel.Controls.Add(MkLbl("DBU Email Address *",
+            // ── Email Address + Send OTP button ──────────────────────────
+            loginPanel.Controls.Add(MkLbl("Email Address *",
                 new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 304)));
-            var txtEmail = MkField("", new Point(40, 325), new Size(fw, 36), fieldBg);
+
+            int sendBtnW    = 110;
+            int emailFieldW = fw - sendBtnW - 8;
+            var txtEmail = MkField("e.g. you@gmail.com", new Point(40, 325), new Size(emailFieldW, 36), fieldBg);
             loginPanel.Controls.Add(txtEmail);
+
+            // OTP state variable captured in closure
+            string generatedOtp = "";
+
+            Button btnSendOtp = MkBtn("Send OTP", new Point(40 + emailFieldW + 8, 325), new Size(sendBtnW, 36),
+                Color.FromArgb(37, 99, 235), Color.White, new Font("Segoe UI", 9, FontStyle.Bold));
+            btnSendOtp.Click += async (s2, e2) =>
+            {
+                string email = txtEmail.Text.Trim();
+                if (string.IsNullOrWhiteSpace(email) || email == "e.g. you@gmail.com")
+                { UIHelper.ShowToast("Please enter your email address first.", true); return; }
+
+                if (!email.Contains("@") || !email.Contains("."))
+                { UIHelper.ShowToast("Please enter a valid email address.", true); return; }
+
+                generatedOtp = new Random().Next(100000, 999999).ToString();
+                btnSendOtp.Enabled   = false;
+                btnSendOtp.Text      = "Sending...";
+                btnSendOtp.BackColor = Color.FromArgb(150, 150, 150);
+
+                bool sent = await Task.Run(() => SendOtpEmail(email, generatedOtp));
+
+                if (sent)
+                {
+                    UIHelper.ShowToast($"OTP sent to {email}. Check your inbox.");
+                    btnSendOtp.Text      = "Resend OTP";
+                    btnSendOtp.BackColor = Color.FromArgb(34, 139, 34);
+                }
+                else
+                {
+                    UIHelper.ShowToast("Failed to send OTP. Check your internet connection.", true);
+                    btnSendOtp.Text      = "Send OTP";
+                    btnSendOtp.BackColor = Color.FromArgb(37, 99, 235);
+                }
+                btnSendOtp.Enabled = true;
+            };
+            loginPanel.Controls.Add(btnSendOtp);
+
+            // ── OTP Field ────────────────────────────────────────────────
+            loginPanel.Controls.Add(MkLbl("Enter OTP *",
+                new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 375)));
+            Label otpHint = MkLbl("(click Send OTP first to receive your code)",
+                new Font("Segoe UI", 9), Color.FromArgb(150, 160, 180), new Point(135, 377));
+            loginPanel.Controls.Add(otpHint);
+
+            var txtOtp = MkField("", new Point(40, 396), new Size(fw, 36), fieldBg);
+            loginPanel.Controls.Add(txtOtp);
 
             // ── Password  +  Confirm Password (side by side) ─────────────
             loginPanel.Controls.Add(MkLbl("Password *",
-                new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 375)));
+                new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40, 446)));
             loginPanel.Controls.Add(MkLbl("Confirm Password *",
-                new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40 + halfW + 14, 375)));
-            var txtPwd  = MkField("", new Point(40, 396),            new Size(halfW, 36), fieldBg, true);
-            var txtCPwd = MkField("Confirm your passw", new Point(40 + halfW + 14, 396), new Size(halfW, 36), fieldBg, true);
+                new Font("Segoe UI", 10, FontStyle.Bold), darkTxt, new Point(40 + halfW + 14, 446)));
+            var txtPwd  = MkField("", new Point(40, 467),              new Size(halfW, 36), fieldBg, true);
+            var txtCPwd = MkField("", new Point(40 + halfW + 14, 467), new Size(halfW, 36), fieldBg, true);
             loginPanel.Controls.Add(txtPwd);
             loginPanel.Controls.Add(txtCPwd);
 
             // ── Terms checkbox ───────────────────────────────────────────
             var chkTerms = new CheckBox
             {
-                AutoSize  = true, Location = new Point(40, 450),
+                AutoSize  = true, Location = new Point(40, 520),
                 Font      = new Font("Segoe UI", 10),
                 ForeColor = midTxt,
                 Text      = "I agree to the "
@@ -294,59 +339,54 @@ namespace RestaurantDesktopApp
             loginPanel.Controls.Add(chkTerms);
 
             LinkLabel lnkTerms = new LinkLabel { Text = "Terms of Service", Font = new Font("Segoe UI", 10),
-                LinkColor = accent, AutoSize = true, Location = new Point(40 + chkTerms.PreferredSize.Width, 450) };
+                LinkColor = accent, AutoSize = true, Location = new Point(40 + chkTerms.PreferredSize.Width, 520) };
             loginPanel.Controls.Add(lnkTerms);
 
             Label andLbl = MkLbl(" and ", new Font("Segoe UI", 10), midTxt,
-                new Point(lnkTerms.Left + lnkTerms.PreferredWidth, 450));
+                new Point(lnkTerms.Left + lnkTerms.PreferredWidth, 520));
             loginPanel.Controls.Add(andLbl);
 
             LinkLabel lnkPriv = new LinkLabel { Text = "Privacy Policy", Font = new Font("Segoe UI", 10),
-                LinkColor = accent, AutoSize = true, Location = new Point(andLbl.Left + andLbl.PreferredWidth, 450) };
+                LinkColor = accent, AutoSize = true, Location = new Point(andLbl.Left + andLbl.PreferredWidth, 520) };
             loginPanel.Controls.Add(lnkPriv);
 
             // ── Create Account button ────────────────────────────────────
-            Button btnCreate = MkBtn("Create Student Account",
-                new Point(40, 480), new Size(fw, 50),
+            Button btnCreate = MkBtn("Create Account",
+                new Point(40, 552), new Size(fw, 50),
                 accent, Color.White, new Font("Segoe UI", 13, FontStyle.Bold));
             btnCreate.Click += (s2, e2) =>
             {
-                if (string.IsNullOrWhiteSpace(txtFN.Text) ||
-                    string.IsNullOrWhiteSpace(txtEmail.Text) ||
+                // 1. Required fields
+                if (string.IsNullOrWhiteSpace(txtFN.Text) || txtFN.Text == "e.g. John Smith" ||
+                    string.IsNullOrWhiteSpace(txtEmail.Text) || txtEmail.Text == "e.g. you@gmail.com" ||
                     string.IsNullOrWhiteSpace(txtPwd.Text))
                 { UIHelper.ShowToast("Please fill in all required fields.", true); return; }
 
+                // 2. Email format check
+                if (!txtEmail.Text.Contains("@") || !txtEmail.Text.Contains("."))
+                { UIHelper.ShowToast("Please enter a valid email address.", true); return; }
+                
+                // 3. OTP check
+                if (string.IsNullOrEmpty(generatedOtp))
+                { UIHelper.ShowToast("Please click 'Send OTP' first.", true); return; }
+                if (txtOtp.Text.Trim() != generatedOtp)
+                { UIHelper.ShowToast("Incorrect OTP. Please try again.", true); return; }
+
+                // 4. Password match
                 if (txtPwd.Text != txtCPwd.Text)
                 { UIHelper.ShowToast("Passwords do not match.", true); return; }
 
-                if (!txtEmail.Text.EndsWith("@dbu.edu.et", StringComparison.OrdinalIgnoreCase))
-                { UIHelper.ShowToast("Please use your official @dbu.edu.et email.", true); return; }
-
-                try
-                {
-                    using var conn2 = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
-                    conn2.Open();
-                    string chk = "SELECT COUNT(*) FROM Users WHERE Username=@u";
-                    using var chkCmd = new MySqlCommand(chk, conn2);
-                    chkCmd.Parameters.AddWithValue("@u", txtEmail.Text);
-                    if (Convert.ToInt32(chkCmd.ExecuteScalar()) > 0)
-                    { UIHelper.ShowToast("Email already registered.", true); return; }
-
-                    string ins = "INSERT INTO Users (Name, Role, Username, Password) VALUES (@n,'User',@u,@p)";
-                    using var insCmd = new MySqlCommand(ins, conn2);
-                    insCmd.Parameters.AddWithValue("@n", txtFN.Text);
-                    insCmd.Parameters.AddWithValue("@u", txtEmail.Text);
-                    insCmd.Parameters.AddWithValue("@p", txtPwd.Text);
-                    insCmd.ExecuteNonQuery();
-
-                    UIHelper.ShowToast("Registration successful! Please sign in.");
-                    ShowLoginPanel();
-                    PositionPanels();
-                }
-                catch (Exception ex)
-                {
-                    UIHelper.ShowToast("Error: " + ex.Message, true);
-                }
+                // Register user in memory
+                Program.RegisteredUsers.Add(new MockUser 
+                { 
+                    Name = txtFN.Text.Trim(), 
+                    Email = txtEmail.Text.Trim(), 
+                    Password = txtPwd.Text 
+                });
+                
+                UIHelper.ShowToast("Registration successful! Please sign in.");
+                ShowLoginPanel();
+                PositionPanels();
             };
             loginPanel.Controls.Add(btnCreate);
 
@@ -385,7 +425,53 @@ namespace RestaurantDesktopApp
             return tb;
         }
 
-        // ── UI helpers ──────────────────────────────────────────────────
+        // ── SMTP Email sender for OTP ────────────────────────────────────
+        // NOTE: Replace the values below with your own Gmail credentials.
+        // To get an App Password:
+        //   1. Go to myaccount.google.com > Security > 2-Step Verification
+        //   2. Then go to  App Passwords and create one for "Mail"
+        private bool SendOtpEmail(string toEmail, string otp)
+        {
+            // ▼ CONFIGURE YOUR SENDER EMAIL HERE ▼
+            const string SenderEmail    = "redietsharew231@gmail.com";  // your gmail
+            const string SenderPassword = "jjzo rdsd toau weri";          // 16-char app password
+            // ▲──────────────────────────────────▲
+
+            try
+            {
+                using var mail = new MailMessage();
+                mail.From    = new MailAddress(SenderEmail, "Restaurant App");
+                mail.To.Add(toEmail);
+                mail.Subject = "Your OTP Verification Code";
+                mail.IsBodyHtml = true;
+                mail.Body = $@"
+<div style='font-family:Segoe UI,sans-serif;max-width:480px;margin:auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden'>
+  <div style='background:#FAA307;padding:24px;text-align:center'>
+    <h2 style='color:#fff;margin:0'>🍳 Restaurant App</h2>
+  </div>
+  <div style='padding:32px'>
+    <h3 style='color:#111827'>Your Verification Code</h3>
+    <p style='color:#6b7280'>Use the code below to complete your registration:</p>
+    <div style='background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;letter-spacing:8px;font-size:32px;font-weight:bold;color:#111827'>
+      {otp}
+    </div>
+    <p style='color:#9ca3af;margin-top:24px;font-size:13px'>This code expires in 10 minutes. Do not share it with anyone.</p>
+  </div>
+</div>";
+
+                using var smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.EnableSsl   = true;
+                smtp.Credentials = new NetworkCredential(SenderEmail, SenderPassword);
+                smtp.Send(mail);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
         private Label MkLbl(string text, Font font, Color fore, Point loc)
             => new Label { Text = text, Font = font, ForeColor = fore, AutoSize = true, Location = loc, BackColor = Color.Transparent };
 
@@ -438,21 +524,38 @@ namespace RestaurantDesktopApp
         // ── Login logic (unchanged) ─────────────────────────────────────
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtUsername.Text) || string.IsNullOrEmpty(txtPassword.Text))
+            string userEmail = txtUsername.Text.Trim();
+            string userPass = txtPassword.Text;
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userPass))
             {
-                UIHelper.ShowToast("Please enter username and password.", true);
+                UIHelper.ShowToast("Please enter email and password.", true);
                 return;
             }
 
-            if (txtUsername.Text == "admin@gmail.com" && txtPassword.Text == "12345678")
+            // Admin login
+            if (userEmail == "admin@gmail.com" && userPass == "12345678")
             {
                 UIHelper.ShowToast($"Welcome back, Admin!");
+                Program.IsLoggedIn = true;
                 new AdminMainForm().Show();
-                this.Hide(); // or Close() depending on their app lifecycle
+                this.Hide(); 
+                return;
+            }
+
+            // Custom registered user login
+            var foundUser = Program.RegisteredUsers.Find(u => u.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase) && u.Password == userPass);
+            if (foundUser != null)
+            {
+                Program.IsLoggedIn = true;
+                Program.CurrentUser = foundUser;
+                UIHelper.ShowToast($"Welcome back, {foundUser.Name}!");
+                new CustomerDashboardForm().Show();
+                this.Hide();
             }
             else
             {
-                UIHelper.ShowToast("Invalid username or password.", true);
+                UIHelper.ShowToast("Invalid email or password.", true);
             }
         }
 
@@ -461,7 +564,9 @@ namespace RestaurantDesktopApp
         private void btnCancel_Click(object sender, EventArgs e) { }
         private void lnkRegister_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            new RegisterForm().ShowDialog();
+            // Use the integrated register panel instead of the old standalone RegisterForm
+            ShowRegisterPanel();
+            PositionPanels();
         }
         private void heroPanel_Paint(object sender, PaintEventArgs e) { }
         private void lblTitle_Click(object sender, EventArgs e) { }

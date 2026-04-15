@@ -1140,6 +1140,23 @@ namespace RestaurantDesktopApp
                 Button payBtn = new Button { Text = "Proceed to Payment \u2192", Font = new Font("Segoe UI", 12, FontStyle.Bold), BackColor = Color.FromArgb(37, 99, 235), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Size = new Size(480, 50), Location = new Point(30, 465), Cursor = Cursors.Hand };
                 payBtn.FlatAppearance.BorderSize = 0;
                 payBtn.Click += (s, e) => {
+                    if (!Program.IsLoggedIn)
+                    {
+                        var res = MessageBox.Show("You must register or log in to order and pay. Do you want to register now?", "Account Required", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        if (res == DialogResult.Yes)
+                        {
+                            // Open the LoginForm on the Register tab (no separate RegisterForm)
+                            var loginForm = new LoginForm();
+                            loginForm.ShowDialog();
+                            if (Program.IsLoggedIn)
+                            {
+                                _cartOverlay.Visible = false;
+                                ShowPaymentOverlay(total);
+                            }
+                        }
+                        return;
+                    }
+
                     _cartOverlay.Visible = false;
                     ShowPaymentOverlay(total);
                 };
