@@ -15,7 +15,7 @@ namespace RestaurantDesktopApp
     public static class ApiClient
     {
         private static readonly HttpClient _http;
-        public static string BaseUrl { get; set; } = "http://localhost:5201/api";
+        public static string BaseUrl { get; set; } = "http://localhost:49391/api";
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -40,9 +40,16 @@ namespace RestaurantDesktopApp
                 var response = await _http.PostAsJsonAsync("auth/login", new { Email = email, Password = password });
                 if (response.IsSuccessStatusCode)
                     return await response.Content.ReadFromJsonAsync<LoginResponse>(_jsonOptions);
-                return null;
+                return new LoginResponse { Success = false, Message = "Invalid email or password." };
             }
-            catch { return null; }
+            catch (HttpRequestException)
+            {
+                return new LoginResponse { Success = false, Message = "Cannot connect to the API server. Please ensure the backend is running." };
+            }
+            catch 
+            { 
+                return new LoginResponse { Success = false, Message = "An unexpected error occurred while communicating with the server." }; 
+            }
         }
 
         public static async Task<bool> RegisterAsync(string fullName, string username, string phone, string email, string password)
