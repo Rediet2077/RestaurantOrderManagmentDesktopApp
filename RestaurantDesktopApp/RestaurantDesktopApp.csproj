@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Temporarily removed MySql.Data -->
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="img\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
