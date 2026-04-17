@@ -4,13 +4,11 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace RestaurantDesktopApp
 {
     public partial class LoginForm : Form
     {
-        private MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
         private bool dragging = false;
         private Point dragCursorPoint;
         private Point dragFormPoint;
@@ -82,7 +80,6 @@ namespace RestaurantDesktopApp
             }
 
             // ── Window controls embedded in nav bar (right edge) ─────────
-            // Order: — (min) · 🗖 (max) · ✕ (close)  — same height as nav
             var winDefs = new[] {
                 new { T = "—", H = Color.FromArgb(80,255,255,255), A = new Action(() => this.WindowState = FormWindowState.Minimized) },
                 new { T = "🗖", H = Color.FromArgb(80,255,255,255), A = new Action(() => this.WindowState = this.WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized) },
@@ -354,7 +351,7 @@ namespace RestaurantDesktopApp
             Button btnCreate = MkBtn("Create Account",
                 new Point(40, 552), new Size(fw, 50),
                 accent, Color.White, new Font("Segoe UI", 13, FontStyle.Bold));
-            btnCreate.Click += (s2, e2) =>
+            btnCreate.Click += async (s2, e2) =>
             {
                 // 1. Required fields
                 if (string.IsNullOrWhiteSpace(txtFN.Text) || txtFN.Text == "e.g. John Smith" ||
@@ -376,17 +373,36 @@ namespace RestaurantDesktopApp
                 if (txtPwd.Text != txtCPwd.Text)
                 { UIHelper.ShowToast("Passwords do not match.", true); return; }
 
-                // Register user in memory
-                Program.RegisteredUsers.Add(new MockUser 
-                { 
-                    Name = txtFN.Text.Trim(), 
-                    Email = txtEmail.Text.Trim(), 
-                    Password = txtPwd.Text 
-                });
-                
-                UIHelper.ShowToast("Registration successful! Please sign in.");
-                ShowLoginPanel();
-                PositionPanels();
+                // 5. Register via API
+                btnCreate.Enabled = false;
+                btnCreate.Text = "Creating Account...";
+
+                string userName = txtSID.Text.Trim();
+                if (userName == "e.g. john123") userName = "";
+                string phone = txtPhone.Text.Trim();
+                if (phone == "e.g. 0912345678") phone = "";
+
+                bool registered = await ApiClient.RegisterAsync(
+                    txtFN.Text.Trim(),
+                    userName,
+                    phone,
+                    txtEmail.Text.Trim(),
+                    txtPwd.Text
+                );
+
+                if (registered)
+                {
+                    UIHelper.ShowToast("Registration successful! Please sign in.");
+                    ShowLoginPanel();
+                    PositionPanels();
+                }
+                else
+                {
+                    UIHelper.ShowToast("Registration failed. Email may already exist.", true);
+                }
+
+                btnCreate.Enabled = true;
+                btnCreate.Text = "Create Account";
             };
             loginPanel.Controls.Add(btnCreate);
 
@@ -521,8 +537,8 @@ namespace RestaurantDesktopApp
             else fadeTimer.Stop();
         }
 
-        // ── Login logic (unchanged) ─────────────────────────────────────
-        private void btnLogin_Click(object sender, EventArgs e)
+        // ── Login logic — now calls the API ─────────────────────────────
+        private async void btnLogin_Click(object sender, EventArgs e)
         {
             string userEmail = txtUsername.Text.Trim();
             string userPass = txtPassword.Text;
@@ -533,30 +549,48 @@ namespace RestaurantDesktopApp
                 return;
             }
 
-            // Admin login
-            if (userEmail == "admin@gmail.com" && userPass == "12345678")
-            {
-                UIHelper.ShowToast($"Welcome back, Admin!");
-                Program.IsLoggedIn = true;
-                new AdminMainForm().Show();
-                this.Hide(); 
-                return;
-            }
+            btnLogin.Enabled = false;
+            btnLogin.Text = "Signing In...";
 
-            // Custom registered user login
-            var foundUser = Program.RegisteredUsers.Find(u => u.Email.Equals(userEmail, StringComparison.OrdinalIgnoreCase) && u.Password == userPass);
-            if (foundUser != null)
+            var result = await ApiClient.LoginAsync(userEmail, userPass);
+
+            if (result != null && result.Success)
             {
                 Program.IsLoggedIn = true;
-                Program.CurrentUser = foundUser;
-                UIHelper.ShowToast($"Welcome back, {foundUser.Name}!");
-                new CustomerDashboardForm().Show();
-                this.Hide();
+                Program.CurrentUser = new AppUser
+                {
+                    UserID = result.UserID,
+                    Name = result.FullName,
+                    Email = result.Email,
+                    Role = result.Role,
+                    Token = result.Token
+                };
+
+                UIHelper.ShowToast($"Welcome back, {result.FullName}!");
+
+                if (result.Role == "Admin")
+                {
+                    new AdminMainForm().Show();
+                    this.Hide();
+                }
+                else if (result.Role == "Staff")
+                {
+                    new UserMainForm().Show();
+                    this.Hide();
+                }
+                else
+                {
+                    new CustomerDashboardForm().Show();
+                    this.Hide();
+                }
             }
             else
             {
                 UIHelper.ShowToast("Invalid email or password.", true);
             }
+
+            btnLogin.Enabled = true;
+            btnLogin.Text = "Sign In to Your Account";
         }
 
         // ── Stub handlers required by existing Designer wiring ──────────

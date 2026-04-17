@@ -207,42 +207,32 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                using (var con = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB"))
+                // Load settings from the API asynchronously
+                var task = ApiClient.GetSettingsAsync();
+                task.Wait(TimeSpan.FromSeconds(3)); // quick timeout so app startup isn't blocked
+
+                if (task.IsCompletedSuccessfully && task.Result != null)
                 {
-                    con.Open();
-                    var cmd = new MySql.Data.MySqlClient.MySqlCommand("SELECT * FROM AppSettings", con);
-                    using (var dr = cmd.ExecuteReader())
-                    {
-                        while (dr.Read())
-                        {
-                            string key = dr["SettingKey"]?.ToString() ?? "";
-                            string val = dr["SettingValue"]?.ToString() ?? "";
-                            if (key == "RestaurantName") RestaurantName = val;
-                            else if (key == "Currency") Currency = val;
-                            else if (key == "DarkMode") IsDarkMode = (val == "True");
-                        }
-                    }
-
-                    if (string.IsNullOrEmpty(RestaurantName) || RestaurantName.ToUpper().Contains("GASTRO"))
-                    {
-                        RestaurantName = "LAUNCH";
-                        try {
-                            var updateCmd = new MySql.Data.MySqlClient.MySqlCommand("UPDATE AppSettings SET SettingValue='LAUNCH' WHERE SettingKey='RestaurantName'", con);
-                            updateCmd.ExecuteNonQuery();
-                        } catch { }
-                    }
-
-                    if (string.IsNullOrEmpty(Currency) || Currency.Contains("$") || Currency.Contains("Br (ETB)"))
-                    {
-                        Currency = "Birr (ETB)";
-                        try {
-                            var updateCmd = new MySql.Data.MySqlClient.MySqlCommand("UPDATE AppSettings SET SettingValue='Birr (ETB)' WHERE SettingKey='Currency'", con);
-                            updateCmd.ExecuteNonQuery();
-                        } catch { }
-                    }
+                    var settings = task.Result;
+                    RestaurantName = settings.RestaurantName;
+                    Currency = settings.Currency;
+                    IsDarkMode = (settings.DarkMode == "True");
                 }
+
+                // Apply defaults if needed
+                if (string.IsNullOrEmpty(RestaurantName))
+                    RestaurantName = "DBU RESTAURANTS";
+
+                if (string.IsNullOrEmpty(Currency))
+                    Currency = "Birr (ETB)";
             }
-            catch { /* Fallback to defaults */ }
+            catch
+            {
+                // Fallback to defaults if API is not reachable
+                RestaurantName = "DBU RESTAURANTS";
+                Currency = "Birr (ETB)";
+                IsDarkMode = false;
+            }
         }
     }
 }

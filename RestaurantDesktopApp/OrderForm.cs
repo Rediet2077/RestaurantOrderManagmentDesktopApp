@@ -1,15 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 using System.IO;
 
 namespace RestaurantDesktopApp
 {
     public partial class OrderForm : Form
     {
-         MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
         DataTable orderDetailsTable = new DataTable();
         decimal totalAmount = 0;
 
@@ -17,9 +16,14 @@ namespace RestaurantDesktopApp
         {
             InitializeComponent();
             SetupOrderDetailsTable();
-            LoadTables();
-            LoadCustomers();
-            LoadMenuCards();
+            _ = LoadDataAsync();
+        }
+
+        private async System.Threading.Tasks.Task LoadDataAsync()
+        {
+            await LoadTables();
+            await LoadCustomers();
+            await LoadMenuCards();
         }
 
         private void SetupOrderDetailsTable()
@@ -32,32 +36,41 @@ namespace RestaurantDesktopApp
             dgvOrderDetails.DataSource = orderDetailsTable;
         }
 
-        private void LoadTables()
+        private async System.Threading.Tasks.Task LoadTables()
         {
             try
             {
-                MySqlDataAdapter da = new MySqlDataAdapter("SELECT TableID FROM Tables WHERE Status = 'Available'", con);
+                var tables = await ApiClient.GetAvailableTablesAsync();
                 DataTable dt = new DataTable();
-                da.Fill(dt);
+                dt.Columns.Add("TableID", typeof(int));
+                dt.Columns.Add("TableNumber", typeof(string));
+                foreach (var t in tables)
+                    dt.Rows.Add(t.TableID, t.TableNumber);
+
                 cmbTables.DataSource = dt;
-                cmbTables.DisplayMember = "TableID";
+                cmbTables.DisplayMember = "TableNumber";
                 cmbTables.ValueMember = "TableID";
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void LoadCustomers()
+        private async System.Threading.Tasks.Task LoadCustomers()
         {
             try
             {
-                MySqlDataAdapter da = new MySqlDataAdapter("SELECT CustomerID, Name FROM Customers", con);
+                var customers = await ApiClient.GetCustomersAsync();
                 DataTable dt = new DataTable();
-                da.Fill(dt);
-                
+                dt.Columns.Add("CustomerID", typeof(int));
+                dt.Columns.Add("Name", typeof(string));
+
+                // Add walk-in option
                 DataRow dr = dt.NewRow();
                 dr["CustomerID"] = DBNull.Value;
                 dr["Name"] = "Walk-in";
-                dt.Rows.InsertAt(dr, 0);
+                dt.Rows.Add(dr);
+
+                foreach (var c in customers)
+                    dt.Rows.Add(c.CustomerID, c.Name);
 
                 cmbCustomers.DataSource = dt;
                 cmbCustomers.DisplayMember = "Name";
@@ -66,16 +79,14 @@ namespace RestaurantDesktopApp
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void LoadMenuCards()
+        private async System.Threading.Tasks.Task LoadMenuCards()
         {
             flpMenu.Controls.Clear();
             try
             {
-                con.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT * FROM MenuItems", con);
-                MySqlDataReader dr = cmd.ExecuteReader();
+                var items = await ApiClient.GetMenuItemsAsync();
 
-                while (dr.Read())
+                foreach (var item in items)
                 {
                     Panel card = new Panel();
                     card.Size = new Size(130, 180);
@@ -87,25 +98,23 @@ namespace RestaurantDesktopApp
                     pic.Size = new Size(110, 80);
                     pic.Location = new Point(10, 10);
                     pic.SizeMode = PictureBoxSizeMode.Zoom;
-                    
-                    string imgPath = "";
-                    try { imgPath = dr["ImagePath"].ToString(); } catch { }
-                    
+
+                    string imgPath = item.ImagePath ?? "";
                     string fullPath = Path.Combine(Application.StartupPath, @"..\..\..\", imgPath);
                     if (!string.IsNullOrEmpty(imgPath) && File.Exists(fullPath))
                         pic.Image = Image.FromFile(fullPath);
                     else
-                        pic.BackColor = Color.LightGray; // Placeholder
+                        pic.BackColor = Color.LightGray;
 
                     Label lblName = new Label();
-                    lblName.Text = dr["Name"]?.ToString() ?? "Unknown";
+                    lblName.Text = item.Name ?? "Unknown";
                     lblName.Location = new Point(10, 100);
                     lblName.Size = new Size(110, 20);
                     lblName.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                     lblName.TextAlign = ContentAlignment.MiddleCenter;
 
                     Label lblPrice = new Label();
-                    lblPrice.Text = UIHelper.GetCurrencySymbol() + " " + (dr["Price"]?.ToString() ?? "0.00");
+                    lblPrice.Text = UIHelper.GetCurrencySymbol() + " " + item.Price.ToString("F2");
                     lblPrice.Location = new Point(10, 120);
                     lblPrice.Size = new Size(110, 20);
                     lblPrice.ForeColor = Color.DarkGreen;
@@ -119,11 +128,10 @@ namespace RestaurantDesktopApp
                     btnAdd.BackColor = Color.FromArgb(46, 204, 113);
                     btnAdd.ForeColor = Color.White;
                     btnAdd.Cursor = Cursors.Hand;
-                    
-                    int id = dr["ItemID"] != DBNull.Value ? Convert.ToInt32(dr["ItemID"]) : 0;
-                    string name = dr["Name"]?.ToString() ?? "Unknown";
-                    decimal price = dr["Price"] != DBNull.Value ? Convert.ToDecimal(dr["Price"]) : 0;
-                    
+
+                    int id = item.ItemID;
+                    string name = item.Name ?? "Unknown";
+                    decimal price = item.Price;
                     btnAdd.Click += (s, ev) => AddToOrder(id, name, price);
 
                     card.Controls.Add(pic);
@@ -132,24 +140,19 @@ namespace RestaurantDesktopApp
                     card.Controls.Add(btnAdd);
 
                     flpMenu.Controls.Add(card);
-                    
-                    // Apply rounding after adding to parent so handle is created
+
                     UIHelper.SetRoundedRegion(card, 15);
                     UIHelper.ApplyModernButton(btnAdd, Color.FromArgb(39, 174, 96));
                 }
-                dr.Close();
-                con.Close();
             }
             catch (Exception ex)
             {
-                con.Close();
                 UIHelper.ShowToast("Error loading menu: " + ex.Message, true);
             }
         }
 
         private void AddToOrder(int itemId, string itemName, decimal price)
         {
-            // Check if item already exists in order
             foreach (DataRow row in orderDetailsTable.Rows)
             {
                 if (Convert.ToInt32(row["ItemID"]) == itemId)
@@ -160,7 +163,6 @@ namespace RestaurantDesktopApp
                     return;
                 }
             }
-
             orderDetailsTable.Rows.Add(itemId, itemName, 1, price, price);
             UpdateTotalAmount();
         }
@@ -175,7 +177,7 @@ namespace RestaurantDesktopApp
             lblTotalAmount.Text = UIHelper.GetCurrencySymbol() + " " + totalAmount.ToString("N2");
         }
 
-        private void btnPlaceOrder_Click(object sender, EventArgs e)
+        private async void btnPlaceOrder_Click(object sender, EventArgs e)
         {
             if (orderDetailsTable.Rows.Count == 0)
             {
@@ -190,47 +192,41 @@ namespace RestaurantDesktopApp
 
             try
             {
-                con.Open();
-                MySqlTransaction trans = con.BeginTransaction();
-                try
+                // Build order items list
+                var items = new List<OrderItemDto>();
+                foreach (DataRow row in orderDetailsTable.Rows)
                 {
-                    MySqlCommand cmdOrder = new MySqlCommand(
-                        "INSERT INTO Orders (CustomerID, TableID, TotalAmount, Status) VALUES (@cid, @tid, @total, @status); SELECT LAST_INSERT_ID();", con, trans);
-                    
-                    cmdOrder.Parameters.AddWithValue("@cid", cmbCustomers.SelectedValue ?? DBNull.Value);
-                    cmdOrder.Parameters.AddWithValue("@tid", cmbTables.SelectedValue);
-                    cmdOrder.Parameters.AddWithValue("@total", totalAmount);
-                    cmdOrder.Parameters.AddWithValue("@status", "Pending");
-
-                    int orderId = Convert.ToInt32(cmdOrder.ExecuteScalar());
-
-                    foreach (DataRow row in orderDetailsTable.Rows)
+                    items.Add(new OrderItemDto
                     {
-                        MySqlCommand cmdDetail = new MySqlCommand(
-                            "INSERT INTO OrderDetails (OrderID, ItemID, Quantity, Price) VALUES (@oid, @iid, @qty, @prc)", con, trans);
-                        cmdDetail.Parameters.AddWithValue("@oid", orderId);
-                        cmdDetail.Parameters.AddWithValue("@iid", row["ItemID"]);
-                        cmdDetail.Parameters.AddWithValue("@qty", row["Quantity"]);
-                        cmdDetail.Parameters.AddWithValue("@prc", row["Price"]);
-                        cmdDetail.ExecuteNonQuery();
-                    }
+                        ItemID = Convert.ToInt32(row["ItemID"]),
+                        Quantity = Convert.ToInt32(row["Quantity"]),
+                        Price = Convert.ToDecimal(row["Price"])
+                    });
+                }
 
-                    MySqlCommand cmdTable = new MySqlCommand("UPDATE Tables SET Status = 'Occupied' WHERE TableID = @tid", con, trans);
-                    cmdTable.Parameters.AddWithValue("@tid", cmbTables.SelectedValue);
-                    cmdTable.ExecuteNonQuery();
+                int? customerId = null;
+                if (cmbCustomers.SelectedValue != null && cmbCustomers.SelectedValue != DBNull.Value)
+                {
+                    customerId = Convert.ToInt32(cmbCustomers.SelectedValue);
+                }
 
-                    trans.Commit();
+                int tableId = Convert.ToInt32(cmbTables.SelectedValue);
+
+                int orderId = await ApiClient.CreateOrderAsync(customerId, tableId, totalAmount, items);
+                if (orderId > 0)
+                {
                     UIHelper.ShowToast("Order Placed Successfully!");
                     this.Close();
                 }
-                catch (Exception ex)
+                else
                 {
-                    trans.Rollback();
-                    UIHelper.ShowToast("Order Failed: " + ex.Message, true);
+                    UIHelper.ShowToast("Order failed. Please try again.", true);
                 }
-                finally { con.Close(); }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex)
+            {
+                UIHelper.ShowToast("Order Failed: " + ex.Message, true);
+            }
         }
     }
 }
