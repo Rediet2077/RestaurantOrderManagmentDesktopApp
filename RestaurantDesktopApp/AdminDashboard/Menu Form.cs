@@ -1,16 +1,12 @@
 using System;
 using System.Data;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 using System.IO;
 
 namespace RestaurantDesktopApp
 {
     public partial class Menu_Form : Form
     {
-        MySqlConnection con = new MySqlConnection(
-        "server=localhost;user=root;password=;database=RestaurantDB");
-
         private TextBox txtSearch;
         private Button btnExport;
         private PictureBox picPreview;
@@ -20,7 +16,7 @@ namespace RestaurantDesktopApp
             InitializeComponent();
             SetupAdvancedFeatures();
             dgvMenuItems.CellClick += dgvMenuItems_CellClick;
-            LoadMenuItems();
+            _ = LoadMenuItemsAsync();
             ApplyInteractivity();
         }
 
@@ -38,6 +34,7 @@ namespace RestaurantDesktopApp
             lblSearch.Text = "🔍 Search:";
             lblSearch.Location = new Point(txtSearch.Left - 70, 188);
             lblSearch.AutoSize = true;
+
             // Export Button
             btnExport = new Button();
             btnExport.Text = "Export to CSV";
@@ -70,41 +67,37 @@ namespace RestaurantDesktopApp
         {
             if (dgvMenuItems.DataSource is DataTable dt)
             {
-                string filter = $"Name LIKE '%{txtSearch.Text}%' OR Category LIKE '%{txtSearch.Text}%'";
+                string searchText = txtSearch.Text.Replace("'", "''");
+                string filter = $"Name LIKE '%{searchText}%' OR Category LIKE '%{searchText}%'";
                 dt.DefaultView.RowFilter = filter;
             }
         }
 
-        private void btnAddItem_Click(object sender, EventArgs e)
+        private async void btnAddItem_Click(object sender, EventArgs e)
         {
             try
             {
-                con.Open();
+                bool success = await ApiClient.AddMenuItemAsync(
+                    txtItemName.Text, txtPrice.Text, txtCategory.Text, txtImagePath.Text);
 
-                MySqlCommand cmd = new MySqlCommand(
-                "INSERT INTO MenuItems(Name,Price,Category,ImagePath) VALUES(@n,@p,@c,@img)", con);
-
-                cmd.Parameters.AddWithValue("@n", txtItemName.Text);
-                cmd.Parameters.AddWithValue("@p", txtPrice.Text);
-                cmd.Parameters.AddWithValue("@c", txtCategory.Text);
-                cmd.Parameters.AddWithValue("@img", txtImagePath.Text);
-
-                cmd.ExecuteNonQuery();
-                con.Close();
-
-                UIHelper.ShowToast("Item Added Successfully");
-
-                ClearFields();
-                LoadMenuItems();
+                if (success)
+                {
+                    UIHelper.ShowToast("Item Added Successfully");
+                    ClearFields();
+                    await LoadMenuItemsAsync();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to add item.");
+                }
             }
             catch (Exception ex)
             {
-                con.Close();
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void btnUpdateItem_Click(object sender, EventArgs e)
+        private async void btnUpdateItem_Click(object sender, EventArgs e)
         {
             if (dgvMenuItems.SelectedRows.Count > 0)
             {
@@ -113,24 +106,23 @@ namespace RestaurantDesktopApp
                     var cellVal = dgvMenuItems.SelectedRows[0].Cells["ItemID"].Value;
                     if (cellVal == null || cellVal == DBNull.Value) return;
                     int id = Convert.ToInt32(cellVal);
-                    con.Open();
-                    MySqlCommand cmd = new MySqlCommand(
-                        "UPDATE MenuItems SET Name=@n, Price=@p, Category=@c, ImagePath=@img WHERE ItemID=@id", con);
-                    cmd.Parameters.AddWithValue("@n", txtItemName.Text);
-                    cmd.Parameters.AddWithValue("@p", txtPrice.Text);
-                    cmd.Parameters.AddWithValue("@c", txtCategory.Text);
-                    cmd.Parameters.AddWithValue("@img", txtImagePath.Text);
-                    cmd.Parameters.AddWithValue("@id", id);
 
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                    UIHelper.ShowToast("Item Updated Successfully");
-                    ClearFields();
-                    LoadMenuItems();
+                    bool success = await ApiClient.UpdateMenuItemAsync(
+                        id, txtItemName.Text, txtPrice.Text, txtCategory.Text, txtImagePath.Text);
+
+                    if (success)
+                    {
+                        UIHelper.ShowToast("Item Updated Successfully");
+                        ClearFields();
+                        await LoadMenuItemsAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to update item.");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    con.Close();
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -140,7 +132,7 @@ namespace RestaurantDesktopApp
             }
         }
 
-        private void btnDeleteItem_Click(object sender, EventArgs e)
+        private async void btnDeleteItem_Click(object sender, EventArgs e)
         {
             if (dgvMenuItems.SelectedRows.Count > 0)
             {
@@ -149,21 +141,24 @@ namespace RestaurantDesktopApp
                     var cellVal = dgvMenuItems.SelectedRows[0].Cells["ItemID"].Value;
                     if (cellVal == null || cellVal == DBNull.Value) return;
                     int id = Convert.ToInt32(cellVal);
+
                     if (MessageBox.Show("Are you sure you want to delete this item?", "Delete Item", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     {
-                        con.Open();
-                        MySqlCommand cmd = new MySqlCommand("DELETE FROM MenuItems WHERE ItemID=@id", con);
-                        cmd.Parameters.AddWithValue("@id", id);
-                        cmd.ExecuteNonQuery();
-                        con.Close();
-                        MessageBox.Show("Item Deleted Successfully");
-                        ClearFields();
-                        LoadMenuItems();
+                        bool success = await ApiClient.DeleteMenuItemAsync(id);
+                        if (success)
+                        {
+                            MessageBox.Show("Item Deleted Successfully");
+                            ClearFields();
+                            await LoadMenuItemsAsync();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed to delete item.");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    con.Close();
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -180,16 +175,18 @@ namespace RestaurantDesktopApp
                 ofd.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    // Copy file to Resources if it's not already there
                     string fileName = Path.GetFileName(ofd.FileName);
                     string targetPath = Path.Combine(Application.StartupPath, @"..\..\..\Resources", fileName);
-                    
-                    try {
+
+                    try
+                    {
                         if (!File.Exists(targetPath))
                             File.Copy(ofd.FileName, targetPath);
-                        
+
                         txtImagePath.Text = "Resources/" + fileName;
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         MessageBox.Show("Error copying image: " + ex.Message);
                     }
                 }
@@ -205,15 +202,17 @@ namespace RestaurantDesktopApp
                 txtPrice.Text = row.Cells["Price"].Value?.ToString() ?? "";
                 txtCategory.Text = row.Cells["Category"].Value?.ToString() ?? "";
                 txtImagePath.Text = row.Cells["ImagePath"].Value?.ToString() ?? "";
-                
+
                 string path = txtImagePath.Text;
                 if (!string.IsNullOrEmpty(path))
                 {
-                    try {
+                    try
+                    {
                         string fullPath = Path.Combine(Application.StartupPath, path.Replace("/", "\\"));
                         if (File.Exists(fullPath)) picPreview.Image = Image.FromFile(fullPath);
                         else picPreview.Image = null;
-                    } catch { picPreview.Image = null; }
+                    }
+                    catch { picPreview.Image = null; }
                 }
                 else picPreview.Image = null;
             }
@@ -227,16 +226,11 @@ namespace RestaurantDesktopApp
             txtImagePath.Clear();
         }
 
-        private void LoadMenuItems()
+        private async System.Threading.Tasks.Task LoadMenuItemsAsync()
         {
             try
             {
-                MySqlDataAdapter da = new MySqlDataAdapter(
-                "SELECT * FROM MenuItems", con);
-
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
+                DataTable dt = await ApiClient.GetMenuItemsTableAsync();
                 dgvMenuItems.DataSource = dt;
             }
             catch (Exception ex)

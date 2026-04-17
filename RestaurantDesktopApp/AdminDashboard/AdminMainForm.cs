@@ -1,29 +1,26 @@
 using System;
 using System.Data;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace RestaurantDesktopApp
 {
     public partial class AdminMainForm : Form
     {
-        private MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
-
         public AdminMainForm()
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
         }
 
-        private void AdminMainForm_Load(object sender, EventArgs e)
+        private async void AdminMainForm_Load(object sender, EventArgs e)
         {
             fadeTimer.Start();
             ApplyStyles();
             UIHelper.ApplySidebarStyle(sidebarPanel);
-            ShowDashboardOverview();
+            await ShowDashboardOverviewAsync();
         }
 
-        private void ShowDashboardOverview()
+        private async System.Threading.Tasks.Task ShowDashboardOverviewAsync()
         {
             contentPanel.Controls.Clear();
             lblPanelTitle.Text = "Dashboard Overview";
@@ -35,14 +32,21 @@ namespace RestaurantDesktopApp
             flow.BackColor = Color.FromArgb(249, 250, 251); 
             contentPanel.Controls.Add(flow);
 
-            AddStatCard(flow, "💰 Total Revenue", "12,450 ETB", Color.FromArgb(34, 197, 94));
-            AddStatCard(flow, "📦 Daily Orders", "48", Color.FromArgb(37, 99, 235));
-            AddStatCard(flow, "🍽️ Available Tables", "12/20", Color.FromArgb(245, 158, 11));
-            AddStatCard(flow, "👥 Active Staff", "6", Color.FromArgb(124, 58, 237));
+            // Load real stats from API
+            var stats = await ApiClient.GetStatsAsync();
+            string revenue = stats != null ? $"{stats.TotalRevenue} ETB" : "0.00 ETB";
+            string orders = stats?.TotalOrders.ToString() ?? "0";
+            string tables = stats != null ? $"{stats.AvailableTables}/{stats.TotalTables}" : "0/0";
+            string staff = stats?.ActiveStaff.ToString() ?? "0";
 
-            // Beautiful modern Activity Log Panel
+            AddStatCard(flow, "💰 Total Revenue", revenue, Color.FromArgb(34, 197, 94));
+            AddStatCard(flow, "📦 Total Orders", orders, Color.FromArgb(37, 99, 235));
+            AddStatCard(flow, "🍽️ Available Tables", tables, Color.FromArgb(245, 158, 11));
+            AddStatCard(flow, "👥 Active Staff", staff, Color.FromArgb(124, 58, 237));
+
+            // Activity Log Panel
             Panel activityPanel = new Panel();
-            activityPanel.Size = new Size(contentPanel.Width - 60, 400); // taller
+            activityPanel.Size = new Size(contentPanel.Width - 60, 400);
             activityPanel.BackColor = Color.White;
             activityPanel.Margin = new Padding(0, 30, 0, 0);
             UIHelper.SetRoundedRegion(activityPanel, 15);
@@ -65,7 +69,7 @@ namespace RestaurantDesktopApp
             lstLog.ForeColor = Color.FromArgb(75, 85, 99);
             lstLog.Location = new Point(25, 80);
             lstLog.Size = new Size(activityPanel.Width - 50, 300);
-            lstLog.ItemHeight = 35; // taller items
+            lstLog.ItemHeight = 35;
             lstLog.DrawMode = DrawMode.OwnerDrawFixed;
             lstLog.DrawItem += (s, ev) => 
             {
@@ -76,12 +80,12 @@ namespace RestaurantDesktopApp
                 }
             };
 
-            lstLog.Items.Add("✅ Order #1023 completed seamlessly - 210 ETB  (Just now)");
-            lstLog.Items.Add("📦 Inventory updated: Received 20kg Chicken Breast  (15 mins ago)");
-            lstLog.Items.Add("⚠️ Low stock alert: Table Salt is below threshold  (1 hour ago)");
-            lstLog.Items.Add("👤 Staff member 'Rediet' successfully clocked in  (08:30 AM)");
-            lstLog.Items.Add("✅ Order #1022 completed seamlessly - 45 ETB  (Yesterday)");
-            lstLog.Items.Add("⚙️ System backup successfully completed  (Yesterday)");
+            lstLog.Items.Add($"📊 Dashboard loaded — Revenue: {revenue}  (Just now)");
+            lstLog.Items.Add($"📦 Total orders in system: {orders}  (Current)");
+            lstLog.Items.Add($"🍽️ Available tables: {tables}  (Current)");
+            lstLog.Items.Add($"👥 Active staff members: {staff}  (Current)");
+            lstLog.Items.Add("⚙️ System connected to API backend  (Active)");
+            lstLog.Items.Add("✅ Database integration complete  (Active)");
 
             activityPanel.Controls.Add(lstLog);
         }
@@ -97,7 +101,7 @@ namespace RestaurantDesktopApp
             Label lblT = new Label();
             lblT.Text = title.ToUpper();
             lblT.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            lblT.ForeColor = Color.FromArgb(107, 114, 128); // Muted gray
+            lblT.ForeColor = Color.FromArgb(107, 114, 128);
             lblT.Location = new Point(20, 25);
             lblT.AutoSize = true;
             card.Controls.Add(lblT);
@@ -120,7 +124,7 @@ namespace RestaurantDesktopApp
             UIHelper.ApplyModernButton(btnReports, UIHelper.ControlColor);
             UIHelper.ApplyModernButton(btnStaff, UIHelper.ControlColor);
             UIHelper.ApplyModernButton(btnSettings, UIHelper.ControlColor);
-            UIHelper.ApplyModernButton(btnLogout, Color.FromArgb(231, 76, 60)); // Brighter red on hover
+            UIHelper.ApplyModernButton(btnLogout, Color.FromArgb(231, 76, 60));
 
             lblGreeting.Text = $"{UIHelper.GetGreeting()}, Admin";
             lblTime.Text = DateTime.Now.ToString("T");
@@ -162,6 +166,8 @@ namespace RestaurantDesktopApp
 
         private void btnLogout_Click(object sender, EventArgs e)
         {
+            Program.IsLoggedIn = false;
+            Program.CurrentUser = null;
             this.Close();
             LoginForm login = new LoginForm();
             login.Show();

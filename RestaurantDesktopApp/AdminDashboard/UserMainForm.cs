@@ -1,24 +1,21 @@
 using System;
 using System.Data;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace RestaurantDesktopApp
 {
     public partial class UserMainForm : Form
     {
-        private MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
-
         public UserMainForm()
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
         }
 
-        private void UserMainForm_Load(object sender, EventArgs e)
+        private async void UserMainForm_Load(object sender, EventArgs e)
         {
             fadeTimer.Start();
-            LoadStats();
+            await LoadStatsAsync();
             ApplyStyles();
             UIHelper.ApplySidebarStyle(sidebarPanel);
             ShowStaffOverview();
@@ -127,33 +124,30 @@ namespace RestaurantDesktopApp
                 fadeTimer.Stop();
         }
 
-        private void LoadStats()
+        private async System.Threading.Tasks.Task LoadStatsAsync()
         {
             try
             {
-                con.Open();
-
-                // Free Tables
-                string tblQuery = "SELECT COUNT(*) FROM Tables WHERE Status='Available'";
-                MySqlCommand tblCmd = new MySqlCommand(tblQuery, con);
-                lblTablesVal.Text = tblCmd.ExecuteScalar().ToString();
-
-                // Pending Orders
-                string ordQuery = "SELECT COUNT(*) FROM Orders WHERE Status='Pending'";
-                MySqlCommand ordCmd = new MySqlCommand(ordQuery, con);
-                lblPendingVal.Text = ordCmd.ExecuteScalar().ToString();
-
-                // Menu Items
-                string menuQuery = "SELECT COUNT(*) FROM MenuItems";
-                MySqlCommand menuCmd = new MySqlCommand(menuQuery, con);
-                lblMenuVal.Text = menuCmd.ExecuteScalar().ToString();
-
-                con.Close();
+                var stats = await ApiClient.GetStatsAsync();
+                if (stats != null)
+                {
+                    lblTablesVal.Text = stats.AvailableTables.ToString();
+                    lblPendingVal.Text = stats.PendingOrders.ToString();
+                    lblMenuVal.Text = stats.MenuItemCount.ToString();
+                }
+                else
+                {
+                    lblTablesVal.Text = "0";
+                    lblPendingVal.Text = "0";
+                    lblMenuVal.Text = "0";
+                }
             }
             catch (Exception ex)
             {
-                con.Close();
                 Console.WriteLine("Stats load error: " + ex.Message);
+                lblTablesVal.Text = "0";
+                lblPendingVal.Text = "0";
+                lblMenuVal.Text = "0";
             }
         }
 

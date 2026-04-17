@@ -2,21 +2,18 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 
 namespace RestaurantDesktopApp
 {
     public partial class ReportForm : Form
     {
-        MySqlConnection con = new MySqlConnection("server=localhost;user=root;password=;database=RestaurantDB");
-
         private Button btnExport;
 
         public ReportForm()
         {
             InitializeComponent();
             SetupAdvancedFeatures();
-            LoadStats();
+            _ = LoadStatsAsync();
             lblTotalSales.Text = "Click View to load";
             dgvReport.DataSource = null;
         }
@@ -34,34 +31,25 @@ namespace RestaurantDesktopApp
             UIHelper.ApplyModernButton(btnRefresh, UIHelper.AccentColor);
         }
 
-        private void LoadStats()
+        private async System.Threading.Tasks.Task LoadStatsAsync()
         {
             try
             {
-                con.Open();
-
-                // Revenue
-                string revQuery = "SELECT SUM(TotalAmount) FROM Orders WHERE Status='Paid'";
-                MySqlCommand revCmd = new MySqlCommand(revQuery, con);
-                object rev = revCmd.ExecuteScalar();
-                lblRevenueVal.Text = (rev != DBNull.Value && rev != null) ? $"{UIHelper.GetCurrencySymbol()} {Convert.ToDecimal(rev):N2}" : $"{UIHelper.GetCurrencySymbol()} 0.00";
-
-                // Orders
-                string ordQuery = "SELECT COUNT(*) FROM Orders";
-                MySqlCommand ordCmd = new MySqlCommand(ordQuery, con);
-                lblOrdersVal.Text = ordCmd.ExecuteScalar()?.ToString() ?? "0";
- 
-                // Active Tables
-                string tblQuery = "SELECT COUNT(*) FROM Tables WHERE Status='Occupied'";
-                MySqlCommand tblCmd = new MySqlCommand(tblQuery, con);
-                lblTablesVal.Text = tblCmd.ExecuteScalar()?.ToString() ?? "0";
- 
-                // Pending Orders
-                string pendQuery = "SELECT COUNT(*) FROM Orders WHERE Status='Pending'";
-                MySqlCommand pendCmd = new MySqlCommand(pendQuery, con);
-                lblPendingVal.Text = pendCmd.ExecuteScalar()?.ToString() ?? "0";
-
-                con.Close();
+                var stats = await ApiClient.GetStatsAsync();
+                if (stats != null)
+                {
+                    lblRevenueVal.Text = $"{UIHelper.GetCurrencySymbol()} {stats.TotalRevenue}";
+                    lblOrdersVal.Text = stats.TotalOrders.ToString();
+                    lblTablesVal.Text = (stats.TotalTables - stats.AvailableTables).ToString();
+                    lblPendingVal.Text = stats.PendingOrders.ToString();
+                }
+                else
+                {
+                    lblRevenueVal.Text = $"{UIHelper.GetCurrencySymbol()} 0.00";
+                    lblOrdersVal.Text = "0";
+                    lblTablesVal.Text = "0";
+                    lblPendingVal.Text = "0";
+                }
 
                 // Rounded cards
                 UIHelper.SetRoundedRegion(cardRevenue, 15);
@@ -71,31 +59,17 @@ namespace RestaurantDesktopApp
             }
             catch (Exception ex)
             {
-                con.Close();
                 Console.WriteLine("Stats load error: " + ex.Message);
             }
         }
 
-        private void LoadDailyReport()
+        private async System.Threading.Tasks.Task LoadDailyReportAsync()
         {
             try
             {
-                // Summary of sales by date (default to today)
-                string query = @"
-                    SELECT 
-                        DATE(OrderDate) as Date, 
-                        COUNT(OrderID) as TotalOrders, 
-                        SUM(TotalAmount) as TotalSales 
-                    FROM Orders 
-                    WHERE Status = 'Paid' 
-                    AND DATE(OrderDate) = CURDATE()
-                    GROUP BY DATE(OrderDate)";
-
-                MySqlDataAdapter da = new MySqlDataAdapter(query, con);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                DataTable dt = await ApiClient.GetDailyReportTableAsync();
                 dgvReport.DataSource = dt;
-                
+
                 if (dgvReport.Columns.Contains("TotalSales"))
                 {
                     dgvReport.Columns["TotalSales"].DefaultCellStyle.Format = UIHelper.GetCurrencySymbol() + " #,##0.00";
@@ -113,10 +87,10 @@ namespace RestaurantDesktopApp
             catch (Exception ex) { UIHelper.ShowToast("Load failed: " + ex.Message, true); }
         }
 
-        private void btnRefresh_Click(object sender, EventArgs e)
+        private async void btnRefresh_Click(object sender, EventArgs e)
         {
-            LoadStats();
-            LoadDailyReport();
+            await LoadStatsAsync();
+            await LoadDailyReportAsync();
         }
 
         private void dgvReport_CellContentClick(object sender, DataGridViewCellEventArgs e)
