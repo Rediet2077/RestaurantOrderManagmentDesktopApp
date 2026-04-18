@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "brvMCM6EA7s=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Redi sha\\source\\repos\\RestaurantDesktopApp\\RestaurantAPI\\RestaurantAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Redi sha\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.4\\microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
+    "C:\\Users\\Redi sha\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
