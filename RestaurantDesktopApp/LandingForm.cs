@@ -20,6 +20,7 @@ namespace RestaurantDesktopApp
         private Panel footerPanel;
         private Panel contactPanel;
         private Panel servicePanel;
+        private System.Collections.Generic.List<MenuItemDto> _apiMenuItems = new();
 
         // Service / menu
         private FlowLayoutPanel _svcGrid;
@@ -32,7 +33,7 @@ namespace RestaurantDesktopApp
         public class CartItem
         {
             public string Name { get; set; }
-            public int Price { get; set; }
+            public decimal Price { get; set; }
             public int Quantity { get; set; }
         }
 
@@ -82,7 +83,7 @@ namespace RestaurantDesktopApp
             MinimumSize = new Size(900, 600);
             Name = "LandingForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "DBU LAUNCH";
+            Text = "BEST RESTAURANT";
             Load += LandingForm_Load;
             Resize += LandingForm_Resize;
             ResumeLayout(false);
@@ -119,6 +120,161 @@ namespace RestaurantDesktopApp
             CreateFooterSection();
 
             ShowPage("HOME");
+        }
+
+        private async Task LoadApiData()
+        {
+            RefreshHeader();
+            try
+            {
+                // 1. Load Stats
+                var stats = await ApiClient.GetStatsAsync();
+                if (stats != null)
+                {
+                    UpdateStatsUI(stats);
+                }
+
+                // 2. Load Popular Dishes
+                var menuItems = await ApiClient.GetMenuItemsAsync();
+                if (menuItems != null && menuItems.Count > 0)
+                {
+                    UpdateDishesUI(menuItems);
+                    UpdateServiceGrid(menuItems);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading API data: " + ex.Message);
+            }
+        }
+
+        public void RefreshHeader()
+        {
+            if (navFlow == null) return;
+            navFlow.Controls.Clear();
+
+            string[] navItems = { "HOME", "ABOUT", "SERVICE", Program.IsLoggedIn ? "PROFILE" : "LOGIN", "CONTACT" };
+            foreach (string item in navItems)
+            {
+                Label nav = new Label();
+                nav.Text = item;
+                nav.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+                nav.ForeColor = (item == "LOGIN" || item == "PROFILE") ? accentOrange : textLight;
+                nav.AutoSize = true;
+                nav.Cursor = Cursors.Hand;
+                nav.Margin = new Padding(10, 0, 10, 0);
+                nav.TextAlign = ContentAlignment.MiddleCenter;
+                nav.Padding = new Padding(0, 24, 0, 0);
+
+                nav.MouseEnter += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = accentOrange; };
+                nav.MouseLeave += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = textLight; };
+
+                if (item == "LOGIN")
+                {
+                    nav.Click += (s, e) => {
+                        var loginForm = new LoginForm();
+                        loginForm.FormClosed += (s2, e2) => { this.Show(); RefreshHeader(); };
+                        this.Hide();
+                        loginForm.Show();
+                    };
+                }
+                else if (item == "PROFILE")
+                {
+                    nav.Click += (s, e) => OpenProfile();
+                }
+                else if (item == "ABOUT") nav.Click += (s, e) => ShowPage("ABOUT");
+                else if (item == "HOME") nav.Click += (s, e) => ShowPage("HOME");
+                else if (item == "CONTACT") nav.Click += (s, e) => ShowPage("CONTACT");
+                else if (item == "SERVICE") nav.Click += (s, e) => ShowPage("SERVICE");
+
+                navFlow.Controls.Add(nav);
+            }
+        }
+
+        private void OpenProfile()
+        {
+            if (Program.CurrentUser == null) return;
+            
+            if (Program.CurrentUser.Role == "Admin")
+            {
+                var adminDash = new AdminMainForm();
+                adminDash.FormClosed += (s, e) => { this.Show(); RefreshHeader(); };
+                this.Hide();
+                adminDash.Show();
+            }
+            else if (Program.CurrentUser.Role == "Staff")
+            {
+                var staffDash = new UserMainForm();
+                staffDash.FormClosed += (s, e) => { this.Show(); RefreshHeader(); };
+                this.Hide();
+                staffDash.Show();
+            }
+            else
+            {
+                var userDash = new CustomerDashboardForm();
+                userDash.FormClosed += (s, e) => { this.Show(); RefreshHeader(); };
+                this.Hide();
+                userDash.Show();
+            }
+        }
+
+        private void UpdateStatsUI(DashboardStatsDto stats)
+        {
+            if (statCards == null || statCards.Length < 3 || stats == null) return;
+            
+            // Experience (hardcoded 10+), Master Chefs (Active Staff), Menu Items
+            string[] nums = { "10+", stats.ActiveStaff.ToString(), stats.MenuItemCount.ToString() };
+            for (int i = 0; i < 3; i++)
+            {
+                if (statCards[i] != null && statCards[i].Controls.Count > 0 && statCards[i].Controls[0] is Label nLbl)
+                {
+                    nLbl.Text = nums[i];
+                }
+            }
+        }
+
+        private void UpdateDishesUI(List<MenuItemDto> items)
+        {
+            if (items == null || dishCards == null) return;
+
+            // Take top 3 for the dishes section
+            var top3 = items.Take(3).ToList();
+            for (int i = 0; i < Math.Min(3, top3.Count); i++)
+            {
+                var item = top3[i];
+                if (i < dishCards.Length && dishCards[i] != null)
+                {
+                    // Update name
+                    foreach (Control c in dishCards[i].Controls)
+                    {
+                        if (c is Label nameLbl)
+                        {
+                            nameLbl.Text = item.Name;
+                        }
+                        if (c is PictureBox pic && !string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            _ = UIHelper.LoadImageAsync(pic, item.ImagePath);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void UpdateServiceGrid(List<MenuItemDto> items)
+        {
+            if (_svcGrid == null) return;
+            _svcGrid.Controls.Clear();
+            foreach (var item in items)
+            {
+                _svcGrid.Controls.Add(MkFoodCard(
+                    item.Name, 
+                    item.Category, 
+                    5, 
+                    item.Price, 
+                    item.IsAvailable ? "" : "Sold Out", 
+                    item.ImagePath));
+            }
+            LayoutService();
         }
 
         private void ShowPage(string page)
@@ -190,7 +346,7 @@ namespace RestaurantDesktopApp
 
             // Logo text
             Label logoLabel = new Label();
-            logoLabel.Text = "DBU LAUNCH";
+            logoLabel.Text = "BEST RESTAURANT";
             logoLabel.Font = new Font("Segoe UI", 18, FontStyle.Bold);
             logoLabel.ForeColor = accentOrange;
             logoLabel.AutoSize = true;
@@ -230,7 +386,7 @@ namespace RestaurantDesktopApp
                     nav.Click += (s, e) =>
                     {
                         var loginForm = new LoginForm();
-                        loginForm.FormClosed += (s2, e2) => this.Show();
+                        loginForm.FormClosed += (s2, e2) => { this.Show(); RefreshHeader(); };
                         this.Hide();
                         loginForm.Show();
                     };
@@ -298,7 +454,7 @@ namespace RestaurantDesktopApp
             heroPanel.Controls.Add(lblTitle3);
 
             lblDesc = new Label();
-            lblDesc.Text = "DBU LAUNCH delivers premium quality food right to your\ndoorstep. Fast, fresh, and flavorful meals for students\nand staff at Debre Brehan University.";
+            lblDesc.Text = "BEST RESTAURANT delivers premium quality food right to your\ndoorstep. Fast, fresh, and flavorful meals for all our\nvalued customers.";
             lblDesc.Font = new Font("Segoe UI", 13);
             lblDesc.ForeColor = Color.FromArgb(75, 85, 99);
             lblDesc.AutoSize = true;
@@ -316,13 +472,16 @@ namespace RestaurantDesktopApp
             heroPanel.Controls.Add(orderBtn);
 
             // Building image
-            string imgPath = System.IO.Path.Combine(Application.StartupPath, "img", "picdescktop.jpg");
+            string imgPath = System.IO.Path.Combine(Application.StartupPath, "img", "r1.jpg");
             buildingPic = new PictureBox();
             buildingPic.Size = new Size(480, 320);
             buildingPic.SizeMode = PictureBoxSizeMode.StretchImage;
             buildingPic.BackColor = Color.FromArgb(30, 30, 30);
             if (System.IO.File.Exists(imgPath))
-                buildingPic.Image = Image.FromFile(imgPath);
+            {
+                try { buildingPic.Image = Image.FromFile(imgPath); }
+                catch { buildingPic.BackColor = Color.Gray; }
+            }
             buildingPic.Paint += RoundedPanel_Paint;
             heroPanel.Controls.Add(buildingPic);
 
@@ -585,8 +744,8 @@ namespace RestaurantDesktopApp
             dishSectionTitle.AutoSize = true;
             dishesPanel.Controls.Add(dishSectionTitle);
 
-            string[] dishImages = { "chechebsa.jpg", "fulll.jpg", "koker.jpg" };
-            string[] dishNames  = { "Chechebsa", "Full Ethiopian", "Koker" };
+            string[] dishImages = { "r3.jpg", "r5.jpg", "f1.jpg" };
+            string[] dishNames  = { "stoak", "burger", "cheackn" };
 
             for (int i = 0; i < 3; i++)
             {
@@ -603,7 +762,10 @@ namespace RestaurantDesktopApp
                 pic.SizeMode = PictureBoxSizeMode.StretchImage;
                 pic.BackColor = Color.FromArgb(230, 230, 230);
                 if (System.IO.File.Exists(path))
-                    pic.Image = Image.FromFile(path);
+                {
+                    try { pic.Image = Image.FromFile(path); }
+                    catch { pic.BackColor = Color.FromArgb(200, 200, 200); }
+                }
                 pic.Paint += RoundedPanel_Paint;
                 card.Controls.Add(pic);
 
@@ -697,7 +859,7 @@ namespace RestaurantDesktopApp
             footerPanel.Controls.Add(sendBtn);
 
             copyRight = new Label();
-            copyRight.Text = "© 2024 DBU LAUNCH. All Rights Reserved.";
+            copyRight.Text = "© 2024 BEST RESTAURANT. All Rights Reserved.";
             copyRight.ForeColor = Color.DimGray;
             copyRight.AutoSize = true;
             copyRight.Font = new Font("Segoe UI", 10);
@@ -775,7 +937,7 @@ namespace RestaurantDesktopApp
 
             Label svcSub = new Label
             {
-                Text = "Fresh, delicious meals prepared daily for DBU students and staff",
+                Text = "Fresh, delicious meals prepared daily for our customers",
                 Font = new Font("Segoe UI", 12), ForeColor = Color.FromArgb(100, 116, 139),
                 AutoSize = true, Name = "svcSub"
             };
@@ -827,18 +989,18 @@ namespace RestaurantDesktopApp
             // ── Food data ──────────────────────────────────────────────────
             var foods = new[]
             {
-                new { Name = "Injera & Doro Wat",      Cat = "Ethiopian",     Stars = 5, Price = "85 ETB",  Tag = "Popular",      Img = "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300&h=200&fit=crop" },
-                new { Name = "Chechebsa",              Cat = "Ethiopian",     Stars = 4, Price = "45 ETB",  Tag = "Breakfast",    Img = "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=200&fit=crop" },
-                new { Name = "Shiro Wat",              Cat = "Ethiopian",     Stars = 5, Price = "55 ETB",  Tag = "",             Img = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300&h=200&fit=crop" },
-                new { Name = "Firfir",                 Cat = "Ethiopian",     Stars = 4, Price = "50 ETB",  Tag = "Morning",      Img = "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=300&h=200&fit=crop" },
-                new { Name = "Grilled Tilapia",        Cat = "International", Stars = 4, Price = "120 ETB", Tag = "Chef Special", Img = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop" },
-                new { Name = "Pasta Bolognese",        Cat = "International", Stars = 4, Price = "95 ETB",  Tag = "",             Img = "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=300&h=200&fit=crop" },
-                new { Name = "Garden Salad",           Cat = "International", Stars = 3, Price = "40 ETB",  Tag = "Healthy",      Img = "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300&h=200&fit=crop" },
-                new { Name = "Beef Burger",            Cat = "International", Stars = 5, Price = "85 ETB",  Tag = "Bestseller",   Img = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop" },
-                new { Name = "Sambusa (3 pcs)",        Cat = "Snacks",        Stars = 5, Price = "30 ETB",  Tag = "",             Img = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=200&fit=crop" },
-                new { Name = "Fatira with Honey",      Cat = "Snacks",        Stars = 4, Price = "35 ETB",  Tag = "Sweet",        Img = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=300&h=200&fit=crop" },
-                new { Name = "Fresh Mango Juice",      Cat = "Beverages",     Stars = 5, Price = "35 ETB",  Tag = "",             Img = "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=300&h=200&fit=crop" },
-                new { Name = "Ethiopian Coffee",       Cat = "Beverages",     Stars = 5, Price = "15 ETB",  Tag = "Hot",          Img = "https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=300&h=200&fit=crop" },
+                new { Name = "Injera & Doro Wat",      Cat = "Ethiopian",     Stars = 5, Price = 85m,  Tag = "Popular",      Img = "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=300&h=200&fit=crop" },
+                new { Name = "Chechebsa",              Cat = "Ethiopian",     Stars = 4, Price = 45m,  Tag = "Breakfast",    Img = "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300&h=200&fit=crop" },
+                new { Name = "Shiro Wat",              Cat = "Ethiopian",     Stars = 5, Price = 55m,  Tag = "",             Img = "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=300&h=200&fit=crop" },
+                new { Name = "Firfir",                 Cat = "Ethiopian",     Stars = 4, Price = 50m,  Tag = "Morning",      Img = "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=300&h=200&fit=crop" },
+                new { Name = "Grilled Tilapia",        Cat = "International", Stars = 4, Price = 120m, Tag = "Chef Special", Img = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop" },
+                new { Name = "Pasta Bolognese",        Cat = "International", Stars = 4, Price = 95m,  Tag = "",             Img = "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=300&h=200&fit=crop" },
+                new { Name = "Garden Salad",           Cat = "International", Stars = 3, Price = 40m,  Tag = "Healthy",      Img = "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=300&h=200&fit=crop" },
+                new { Name = "Beef Burger",            Cat = "International", Stars = 5, Price = 85m,  Tag = "Bestseller",   Img = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop" },
+                new { Name = "Sambusa (3 pcs)",        Cat = "Snacks",        Stars = 5, Price = 30m,  Tag = "",             Img = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=200&fit=crop" },
+                new { Name = "Fatira with Honey",      Cat = "Snacks",        Stars = 4, Price = 35m,  Tag = "Sweet",        Img = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=300&h=200&fit=crop" },
+                new { Name = "Fresh Mango Juice",      Cat = "Beverages",     Stars = 5, Price = 35m,  Tag = "",             Img = "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=300&h=200&fit=crop" },
+                new { Name = "Ethiopian Coffee",       Cat = "Beverages",     Stars = 5, Price = 15m,  Tag = "Hot",          Img = "https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=300&h=200&fit=crop" },
             };
 
             foreach (var f in foods)
@@ -879,7 +1041,7 @@ namespace RestaurantDesktopApp
             LayoutService();
         }
 
-        private Panel MkFoodCard(string name, string cat, int stars, string price, string tag, string imgUrl)
+        private Panel MkFoodCard(string name, string cat, int stars, decimal price, string tag, string imgUrl)
         {
             const int CW = 240, CH = 330;
             Color cardShadow = Color.FromArgb(226, 232, 240);
@@ -902,9 +1064,14 @@ namespace RestaurantDesktopApp
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BackColor = cardShadow
             };
-            try { pic.LoadAsync(imgUrl); } catch { }
-            pic.Paint += RoundedPanel_Paint;
+            
+            _ = UIHelper.LoadImageAsync(pic, imgUrl);
+            
+            ToolTip tt = new ToolTip();
+            tt.SetToolTip(pic, imgUrl);
+            
             card.Controls.Add(pic);
+            pic.BringToFront();
 
             // ─ Tag badge ──────────────────────────────────────────────────────
             if (!string.IsNullOrEmpty(tag))
@@ -960,7 +1127,7 @@ namespace RestaurantDesktopApp
             // ─ Price ───────────────────────────────────────────────────────────
             Label priceLbl = new Label
             {
-                Text = price, AutoSize = true,
+                Text = $"{price} {UIHelper.GetCurrencySymbol()}", AutoSize = true,
                 Font      = new Font("Segoe UI", 13, FontStyle.Bold),
                 ForeColor = accentOrange,
                 Location  = new Point(12, 262)
@@ -979,16 +1146,14 @@ namespace RestaurantDesktopApp
             };
             addBtn.FlatAppearance.BorderSize = 0;
             
-            // Extract numeric price
-            int priceVal = 0;
-            if (price.Contains(" ")) int.TryParse(price.Split(' ')[0], out priceVal);
+            decimal capturedPrice = price;
             string capturedName = name;
             
             addBtn.Click += (s, e) =>
             {
                 var existing = _cartItems.Find(c => c.Name == capturedName);
                 if (existing != null) existing.Quantity++;
-                else _cartItems.Add(new CartItem { Name = capturedName, Price = priceVal, Quantity = 1 });
+                else _cartItems.Add(new CartItem { Name = capturedName, Price = capturedPrice, Quantity = 1 });
 
                 _cartCount++;
                 _svcCartBtn.Text = $"\ud83d\uded2  Cart ({_cartCount})";
@@ -1108,9 +1273,12 @@ namespace RestaurantDesktopApp
                 dialog.Controls.Add(listPan);
 
                 int cy = 0;
-                int total = 0;
+                decimal total = 0;
                 foreach (var item in _cartItems)
                 {
+                    decimal lineTotal = item.Price * item.Quantity;
+                    total += lineTotal;
+                
                     Panel itemPan = new Panel { Size = new Size(460, 50), Location = new Point(10, cy), BackColor = Color.FromArgb(249, 250, 251) };
                     itemPan.Paint += RoundedPanel_Paint;
                     listPan.Controls.Add(itemPan);
@@ -1118,7 +1286,6 @@ namespace RestaurantDesktopApp
                     Label qtyLbl = new Label { Text = $"{item.Quantity}x", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = accentOrange, AutoSize = true, Location = new Point(15, 13) };
                     Label nmLbl = new Label { Text = item.Name, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = true, Location = new Point(50, 13) };
 
-                    int lineTotal = item.Price * item.Quantity;
                     Label prLbl = new Label { Text = $"{lineTotal} ETB", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = false, TextAlign = ContentAlignment.TopRight, Size = new Size(100, 25), Location = new Point(340, 13) };
                     
                     itemPan.Controls.Add(qtyLbl);
@@ -1126,7 +1293,6 @@ namespace RestaurantDesktopApp
                     itemPan.Controls.Add(prLbl);
 
                     cy += 60;
-                    total += lineTotal;
                 }
 
                 Panel bottomLine = new Panel { BackColor = Color.FromArgb(229, 231, 235), Size = new Size(480, 2), Location = new Point(30, 380) };
@@ -1142,12 +1308,15 @@ namespace RestaurantDesktopApp
                 payBtn.Click += (s, e) => {
                     if (!Program.IsLoggedIn)
                     {
-                        var res = MessageBox.Show("You must register or log in to order and pay. Do you want to register now?", "Account Required", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        var res = MessageBox.Show("You must register or log in to complete your order and pay. Do you want to sign in now?", "Account Required", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                         if (res == DialogResult.Yes)
                         {
-                            // Open the LoginForm on the Register tab (no separate RegisterForm)
                             var loginForm = new LoginForm();
+                            this.Hide();
                             loginForm.ShowDialog();
+                            this.Show();
+                            RefreshHeader();
+                            
                             if (Program.IsLoggedIn)
                             {
                                 _cartOverlay.Visible = false;
@@ -1168,7 +1337,7 @@ namespace RestaurantDesktopApp
             }
         }
 
-        private void ShowPaymentOverlay(int totalAmount)
+        private void ShowPaymentOverlay(decimal totalAmount)
         {
             if (_paymentOverlay == null)
             {
@@ -1390,7 +1559,10 @@ namespace RestaurantDesktopApp
                 Name = "ctPic"
             };
             if (System.IO.File.Exists(imgPath))
-                contactPic.Image = Image.FromFile(imgPath);
+            {
+                try { contactPic.Image = Image.FromFile(imgPath); }
+                catch { contactPic.BackColor = Color.FromArgb(230, 230, 230); }
+            }
             contactPic.Paint += RoundedPanel_Paint;
             card.Controls.Add(contactPic);
 
@@ -1408,7 +1580,7 @@ namespace RestaurantDesktopApp
             card.Controls.Add(divLine);
 
             string[] infoLabels = { "Email:", "Phone:", "Address:" };
-            string[] infoVals   = { "dining@dbu.edu.et", "+251 01 081 5440", "Debre Birhan University, Debre Birhan, Amhara, Ethiopia" };
+            string[] infoVals   = { "dining@bestrestaurant.com", "+251 01 081 5440", "Main Street, Addis Ababa, Ethiopia" };
             for (int i = 0; i < 3; i++)
             {
                 Label lKey = new Label { Text = infoLabels[i], Font = new Font("Segoe UI", 10, FontStyle.Bold), ForeColor = Color.FromArgb(55,65,81), AutoSize = true, Name = $"ctInfoK{i}" };
@@ -1527,6 +1699,9 @@ namespace RestaurantDesktopApp
             }
         }
 
-        private void LandingForm_Load(object sender, EventArgs e) { }
+        private void LandingForm_Load(object sender, EventArgs e)
+        {
+            _ = LoadApiData();
+        }
     }
 }

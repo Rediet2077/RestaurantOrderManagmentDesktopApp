@@ -2,13 +2,14 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace RestaurantDesktopApp
 {
     public static class UIHelper
     {
         // Premium Color Palette
-        // Premium Color Palette - Refined
         public static Color PrimaryColor = Color.FromArgb(41, 128, 185);    // Modern Blue
         public static Color SecondaryColor = Color.FromArgb(52, 152, 219);  // Light Blue
         public static Color DarkSidebar = Color.FromArgb(28, 40, 51);      // Deep Slate
@@ -19,7 +20,7 @@ namespace RestaurantDesktopApp
         public static Color SidebarColor = Color.FromArgb(44, 62, 80);     // Wet Asphalt
         public static Color ControlColor = Color.FromArgb(52, 73, 94);    // Gray Blue
 
-        // Dark Mode Colors - Refined
+        // Dark Mode Colors
         public static Color DarkBg = Color.FromArgb(18, 24, 31);
         public static Color DarkControl = Color.FromArgb(33, 47, 60);
         public static Color DarkText = Color.FromArgb(235, 237, 239);
@@ -120,7 +121,6 @@ namespace RestaurantDesktopApp
             btn.MouseEnter += (s, e) => {
                 btn.BackColor = hoverColor;
                 btn.ForeColor = Color.White;
-                // Subtle lift effect
                 btn.Padding = new Padding(5, 0, 0, 0); 
             };
 
@@ -165,14 +165,12 @@ namespace RestaurantDesktopApp
                 if (dgv.Rows.Count == 0) return;
 
                 string csvData = "";
-                // Add header
                 foreach (DataGridViewColumn col in dgv.Columns)
                 {
                     csvData += col.HeaderText + ",";
                 }
                 csvData += "\r\n";
 
-                // Add rows
                 foreach (DataGridViewRow row in dgv.Rows)
                 {
                     if (!row.IsNewRow)
@@ -205,33 +203,79 @@ namespace RestaurantDesktopApp
 
         public static void LoadGlobalSettings()
         {
+            RestaurantName = "BEST RESTAURANTS";
+            Currency = "Birr (ETB)";
+            IsDarkMode = false;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var settings = await ApiClient.GetSettingsAsync();
+                    if (settings != null)
+                    {
+                        RestaurantName = settings.RestaurantName;
+                        Currency = settings.Currency;
+                        IsDarkMode = (settings.DarkMode == "True");
+                    }
+                }
+                catch { }
+            });
+        }
+
+        private static ConcurrentDictionary<string, Image> _imageCache = new();
+
+        public static async Task LoadImageAsync(PictureBox pic, string url)
+        {
+            if (string.IsNullOrEmpty(url)) return;
+
+            if (_imageCache.TryGetValue(url, out Image? cachedImg))
+            {
+                pic.Image = cachedImg;
+                return;
+            }
+
             try
             {
-                // Load settings from the API asynchronously
-                var task = ApiClient.GetSettingsAsync();
-                task.Wait(TimeSpan.FromSeconds(3)); // quick timeout so app startup isn't blocked
-
-                if (task.IsCompletedSuccessfully && task.Result != null)
+                if (url.StartsWith("http"))
                 {
-                    var settings = task.Result;
-                    RestaurantName = settings.RestaurantName;
-                    Currency = settings.Currency;
-                    IsDarkMode = (settings.DarkMode == "True");
+                    using var client = new System.Net.Http.HttpClient();
+                    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
+                    var bytes = await client.GetByteArrayAsync(url);
+                    using var ms = new System.IO.MemoryStream(bytes);
+                    using var rawImg = Image.FromStream(ms);
+                    
+                    // Create a copy that doesn't depend on the memory stream
+                    var img = new Bitmap(rawImg);
+                    _imageCache[url] = img;
+                    
+                    if (pic.InvokeRequired)
+                        pic.Invoke(new Action(() => { pic.Image = img; pic.Refresh(); pic.Update(); }));
+                    else
+                    {
+                        pic.Image = img;
+                        pic.Refresh();
+                        pic.Update();
+                    }
                 }
-
-                // Apply defaults if needed
-                if (string.IsNullOrEmpty(RestaurantName))
-                    RestaurantName = "DBU RESTAURANTS";
-
-                if (string.IsNullOrEmpty(Currency))
-                    Currency = "Birr (ETB)";
+                else
+                {
+                    string fullPath = System.IO.Path.Combine(Application.StartupPath, url.Replace("/", "\\"));
+                    if (System.IO.File.Exists(fullPath))
+                    {
+                        var img = Image.FromFile(fullPath);
+                        _imageCache[url] = img;
+                        pic.Image = img;
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fallback to defaults if API is not reachable
-                RestaurantName = "DBU RESTAURANTS";
-                Currency = "Birr (ETB)";
-                IsDarkMode = false;
+                Console.WriteLine($"Image load error for {url}: {ex.Message}");
+                if (pic.InvokeRequired)
+                    pic.Invoke(new Action(() => pic.BackColor = Color.FromArgb(235, 235, 235)));
+                else
+                    pic.BackColor = Color.FromArgb(235, 235, 235);
             }
         }
     }

@@ -64,7 +64,7 @@ namespace RestaurantDesktopApp
             navBar.MouseMove += (s2, e2) => { if (dragging) { var d = Point.Subtract(Cursor.Position, new Size(dragCursorPoint)); this.Location = Point.Add(dragFormPoint, new Size(d)); } };
             navBar.MouseUp   += (s2, e2) => dragging = false;
 
-            Label navLogo = new Label { Text = "🍳  DBU RESTAURANTS", Font = new Font("Segoe UI", 15, FontStyle.Bold), ForeColor = Color.FromArgb(250, 163, 7), AutoSize = true, Location = new Point(28, 18) };
+            Label navLogo = new Label { Text = "🍳  BEST RESTAURANTS", Font = new Font("Segoe UI", 15, FontStyle.Bold), ForeColor = Color.FromArgb(250, 163, 7), AutoSize = true, Location = new Point(28, 18) };
             navBar.Controls.Add(navLogo);
 
             string[] navLinks = { "Home", "Order as Guest" };
@@ -112,7 +112,7 @@ namespace RestaurantDesktopApp
             heroPanel.BackColor = Color.FromArgb(240, 242, 248);
 
             Label t1 = MkLbl("Welcome to ", new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(17, 24, 39), new Point(60, 80));
-            Label t2 = MkLbl("DBU",         new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(250, 163, 7), new Point(60 + t1.PreferredWidth, 80));
+            Label t2 = MkLbl("BEST",         new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(250, 163, 7), new Point(60 + t1.PreferredWidth, 80));
             Label t3 = MkLbl("Restaurants", new Font("Segoe UI", 26, FontStyle.Bold), Color.FromArgb(250, 163, 7), new Point(60, 122));
             heroPanel.Controls.AddRange(new Control[] { t1, t2, t3 });
 
@@ -162,7 +162,7 @@ namespace RestaurantDesktopApp
             // ── Heading ─────────────────────────────────────────────────
             loginPanel.Controls.Add(MkLbl("Welcome Back! 👋",
                 new Font("Segoe UI", 18, FontStyle.Bold), Color.FromArgb(17, 24, 39), new Point(40, 88)));
-            loginPanel.Controls.Add(MkLbl("Sign in to your DBU Restaurants account",
+            loginPanel.Controls.Add(MkLbl("Sign in to your BEST Restaurants account",
                 new Font("Segoe UI", 11), Color.FromArgb(100, 110, 130), new Point(40, 124)));
 
             // ── Email ───────────────────────────────────────────────────

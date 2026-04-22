@@ -12,6 +12,7 @@ namespace RestaurantDesktopApp
         public string Name { get; set; } = "";
         public string Email { get; set; } = "";
         public string Role { get; set; } = "";
+        public string Phone { get; set; } = "";
         public string Token { get; set; } = "";
     }
 
@@ -23,9 +24,18 @@ namespace RestaurantDesktopApp
         [STAThread]
         static void Main()
         {
-            ApplicationConfiguration.Initialize();
-            UIHelper.LoadGlobalSettings();
-            Application.Run(new LandingForm());
+            try
+            {
+                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls13;
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                UIHelper.LoadGlobalSettings();
+                Application.Run(new LandingForm());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CRITICAL ERROR: " + ex.Message + "\n" + ex.StackTrace, "Startup Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

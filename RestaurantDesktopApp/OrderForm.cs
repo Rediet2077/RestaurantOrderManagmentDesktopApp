@@ -102,7 +102,10 @@ namespace RestaurantDesktopApp
                     string imgPath = item.ImagePath ?? "";
                     string fullPath = Path.Combine(Application.StartupPath, @"..\..\..\", imgPath);
                     if (!string.IsNullOrEmpty(imgPath) && File.Exists(fullPath))
-                        pic.Image = Image.FromFile(fullPath);
+                    {
+                        try { pic.Image = Image.FromFile(fullPath); }
+                        catch { pic.BackColor = Color.LightGray; }
+                    }
                     else
                         pic.BackColor = Color.LightGray;
 
