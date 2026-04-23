@@ -156,3 +156,33 @@ INSERT INTO MenuItems (Name, Price, Category, ImagePath, IsAvailable) VALUES
 ('Tibs (Special)', 280.00, 'Ethiopian', '', 1);
 END
 GO
+
+-- 8. Reservations Table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Reservations' and xtype='U')
+BEGIN
+CREATE TABLE Reservations (
+    ReservationID INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    TableID INT NOT NULL,
+    ReservationDate DATETIME NOT NULL,
+    NumberOfPeople INT NOT NULL,
+    Status VARCHAR(20) DEFAULT 'Confirmed',
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (CustomerID) REFERENCES Users(UserID),
+    FOREIGN KEY (TableID) REFERENCES Tables(TableID)
+);
+END
+GO
+
+-- ========================================================
+-- Additional Seed Data
+-- ========================================================
+
+-- Sample Reservations
+IF NOT EXISTS (SELECT * FROM Reservations)
+BEGIN
+INSERT INTO Reservations (CustomerID, TableID, ReservationDate, NumberOfPeople) VALUES
+(1, 1, DATEADD(day, 1, GETDATE()), 4),
+(1, 2, DATEADD(day, 2, GETDATE()), 2);
+END
+GO

@@ -65,5 +65,10 @@ namespace RestaurantDesktopApp.Database
                 }
             }
         }
+
+        public DataTable GetTables()
+        {
+            return ExecuteQuery("SELECT * FROM Tables");
+        }
     }
 }
