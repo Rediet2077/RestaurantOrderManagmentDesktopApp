@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -10,60 +11,60 @@ namespace RestaurantDesktopApp
 {
     public class CustomerDashboardForm : Form
     {
-        private Panel sidebar;
-        private Panel content;
-        private FlowLayoutPanel ordersFlow;
-        private Label lblGreeting;
-        private Label lblCustomerName;
-        private Label lblCustomerEmail;
+        private Panel sidebar = null!;
+        private Panel mainContent = null!;
+        private Label lblPanelTitle = null!;
         private Color primaryColor = Color.FromArgb(41, 128, 185);
-        private Color sidebarColor = Color.FromArgb(28, 40, 51);
-        private Color accentColor = Color.FromArgb(230, 126, 34);
+        private Color sidebarColor = Color.FromArgb(15, 23, 42); // Darker blue-black
+        private Color accentColor = Color.FromArgb(250, 163, 7); // Gold/Orange
 
         public CustomerDashboardForm()
         {
             SetupUI();
-            _ = LoadDataAsync();
+            this.Load += (s, e) => {
+                // Highlight dashboard button by default
+                foreach (Control c in sidebar.Controls)
+                {
+                    if (c is Button b && b.Text.Contains("DASHBOARD"))
+                    {
+                        b.PerformClick();
+                        break;
+                    }
+                }
+            };
         }
 
         private void SetupUI()
         {
             this.Text = "My Account - BEST Restaurants";
-            this.Size = new Size(1100, 750);
+            this.Size = new Size(1200, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(1000, 700);
-            this.BackColor = Color.FromArgb(244, 247, 252);
+            this.BackColor = Color.FromArgb(243, 244, 246);
             this.Font = new Font("Segoe UI", 10);
+            this.FormBorderStyle = FormBorderStyle.Sizable;
 
             // Sidebar
             sidebar = new Panel { Dock = DockStyle.Left, Width = 260, BackColor = sidebarColor };
             this.Controls.Add(sidebar);
 
-            Panel logoBox = new Panel { Height = 100, Dock = DockStyle.Top };
-            Label logo = new Label { Text = "BEST ACCOUNT", ForeColor = Color.White, Font = new Font("Segoe UI", 16, FontStyle.Bold), AutoSize = false, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter };
+            Panel logoBox = new Panel { Height = 100, Dock = DockStyle.Top, Padding = new Padding(20) };
+            Label logo = new Label { Text = "BEST ACCOUNT", ForeColor = Color.White, Font = new Font("Segoe UI", 16, FontStyle.Bold), Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleCenter };
             logoBox.Controls.Add(logo);
             sidebar.Controls.Add(logoBox);
 
-            AddSidebarBtn("DASHBOARD", "\u25A3", 100).Click += (s, e) => { _ = LoadDataAsync(); content.VerticalScroll.Value = 0; };
-            AddSidebarBtn("MY ORDERS", "\u231A", 160).Click += (s, e) => { 
-                // Scroll to orders
-                content.ScrollControlIntoView(ordersFlow);
-            };
-            AddSidebarBtn("CREATE ORDER", "\u271A", 220).Click += (s, e) => {
-                this.Close(); // Return to landing form
-            };
-            AddSidebarBtn("ACCOUNT SETTINGS", "\u2699", 280).Click += (s, e) => {
-                UIHelper.ShowToast("Account settings feature coming soon!");
-            };
+            AddSidebarBtn("DASHBOARD", "🏠", 100, ShowOverview);
+            AddSidebarBtn("MY ORDERS", "📦", 160, ShowOrders);
+            AddSidebarBtn("CREATE ORDER", "➕", 220, OpenOrderForm);
+            AddSidebarBtn("ACCOUNT SETTINGS", "⚙️", 280, ShowSettings);
 
             Button btnLogout = new Button { 
-                Text = "\u21AA  Logout", 
+                Text = "🚪  Logout", 
                 Dock = DockStyle.Bottom, 
                 Height = 60, 
-                BackColor = Color.FromArgb(192, 57, 43), 
+                BackColor = Color.FromArgb(220, 38, 38), 
                 ForeColor = Color.White, 
                 FlatStyle = FlatStyle.Flat, 
-                Font = new Font("Segoe UI", 12, FontStyle.Bold), 
+                Font = new Font("Segoe UI", 11, FontStyle.Bold), 
                 Cursor = Cursors.Hand 
             };
             btnLogout.FlatAppearance.BorderSize = 0;
@@ -71,153 +72,227 @@ namespace RestaurantDesktopApp
                 Program.IsLoggedIn = false;
                 Program.CurrentUser = null;
                 this.Close();
+                new LandingForm().Show();
             };
             sidebar.Controls.Add(btnLogout);
 
-            // Main Content
-            content = new Panel { Dock = DockStyle.Fill, AutoScroll = true, Padding = new Padding(30) };
-            this.Controls.Add(content);
+            // Header/Main Area
+            Panel header = new Panel { Dock = DockStyle.Top, Height = 70, BackColor = Color.White };
+            this.Controls.Add(header);
 
-            lblGreeting = new Label { Text = UIHelper.GetGreeting() + ",", Font = new Font("Segoe UI", 14), ForeColor = Color.FromArgb(127, 140, 141), AutoSize = true, Location = new Point(30, 30) };
-            content.Controls.Add(lblGreeting);
+            lblPanelTitle = new Label { Text = "Dashboard Overview", Font = new Font("Segoe UI Semibold", 16), ForeColor = Color.FromArgb(31, 41, 55), Location = new Point(25, 20), AutoSize = true };
+            header.Controls.Add(lblPanelTitle);
 
-            lblCustomerName = new Label { Text = Program.CurrentUser?.Name ?? "Valued Customer", Font = new Font("Segoe UI", 26, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80), AutoSize = true, Location = new Point(30, 60) };
-            content.Controls.Add(lblCustomerName);
-
-            // Stats row
-            Panel statsRow = new Panel { Location = new Point(30, 140), Size = new Size(content.Width - 100, 120), Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right };
-            content.Controls.Add(statsRow);
-            
-            AddStatCard(statsRow, 0, "Total Orders", "0", Color.FromArgb(52, 152, 219));
-            AddStatCard(statsRow, 230, "Total Spent", "0.00 ETB", Color.FromArgb(46, 204, 113));
-            AddStatCard(statsRow, 460, "Member Since", DateTime.Now.ToString("MMM yyyy"), Color.FromArgb(155, 89, 182));
-
-            // Profile Info Card
-            Panel infoCard = new Panel { Location = new Point(30, 280), Size = new Size(350, 320), BackColor = Color.White };
-            infoCard.Paint += (s, e) => UIHelper.DrawGradient(e.Graphics, infoCard.ClientRectangle, Color.White, Color.FromArgb(250, 252, 255));
-            UIHelper.SetRoundedRegion(infoCard, 15);
-            content.Controls.Add(infoCard);
-
-            Label infoTitle = new Label { Text = "Profile Information", Font = new Font("Segoe UI", 14, FontStyle.Bold), Location = new Point(20, 20), AutoSize = true };
-            infoCard.Controls.Add(infoTitle);
-
-            lblCustomerEmail = new Label { Text = "\u2709  " + (Program.CurrentUser?.Email ?? "No email"), Location = new Point(20, 70), AutoSize = true, ForeColor = Color.DimGray };
-            infoCard.Controls.Add(lblCustomerEmail);
-            
-            infoCard.Controls.Add(new Label { Text = "\u260E  +251 " + (Program.CurrentUser?.Phone ?? "No phone"), Location = new Point(20, 105), AutoSize = true, ForeColor = Color.DimGray });
-            infoCard.Controls.Add(new Label { Text = "\u2302  Addis Ababa, Ethiopia", Location = new Point(20, 140), AutoSize = true, ForeColor = Color.DimGray });
-
-            Button btnEdit = new Button { Text = "Edit Profile", Location = new Point(20, 250), Size = new Size(310, 45), BackColor = primaryColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 10, FontStyle.Bold), Cursor = Cursors.Hand };
-            UIHelper.SetRoundedRegion(btnEdit, 8);
-            infoCard.Controls.Add(btnEdit);
-
-            // Recent Orders section
-            Label recTitle = new Label { Text = "Recent Order History", Font = new Font("Segoe UI", 16, FontStyle.Bold), Location = new Point(410, 280), AutoSize = true, ForeColor = Color.FromArgb(44, 62, 80) };
-            content.Controls.Add(recTitle);
-
-            ordersFlow = new FlowLayoutPanel { Location = new Point(410, 320), Size = new Size(content.Width - 450, 400), AutoScroll = true, BackColor = Color.Transparent, Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom };
-            content.Controls.Add(ordersFlow);
+            mainContent = new Panel { Dock = DockStyle.Fill, Padding = new Padding(30), AutoScroll = true };
+            this.Controls.Add(mainContent);
+            mainContent.BringToFront();
         }
 
-        private Button AddSidebarBtn(string text, string icon, int y)
+        private void AddSidebarBtn(string text, string icon, int y, Action onClick)
         {
             Button btn = new Button {
                 Text = "  " + icon + "    " + text,
                 Location = new Point(0, y),
                 Size = new Size(260, 50),
                 BackColor = sidebarColor,
-                ForeColor = Color.FromArgb(189, 195, 199),
+                ForeColor = Color.FromArgb(156, 163, 175),
                 FlatStyle = FlatStyle.Flat,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Cursor = Cursors.Hand,
-                Padding = new Padding(25, 0, 0, 0)
+                FlatAppearance = { BorderSize = 0 }
             };
-            btn.FlatAppearance.BorderSize = 0;
-            btn.MouseEnter += (s, e) => { btn.BackColor = Color.FromArgb(52, 73, 94); btn.ForeColor = Color.White; };
-            btn.MouseLeave += (s, e) => { btn.BackColor = sidebarColor; btn.ForeColor = Color.FromArgb(189, 195, 199); };
-            
+            btn.Click += (s, e) => {
+                foreach (Control c in sidebar.Controls) if (c is Button b) b.ForeColor = Color.FromArgb(156, 163, 175);
+                btn.ForeColor = accentColor;
+                onClick();
+            };
             sidebar.Controls.Add(btn);
-            return btn;
         }
 
-        private void AddStatCard(Panel container, int x, string title, string val, Color accent)
+        private void ShowOverview()
         {
-            Panel card = new Panel { Location = new Point(x, 0), Size = new Size(210, 100), BackColor = Color.White };
-            UIHelper.SetRoundedRegion(card, 12);
+            lblPanelTitle.Text = "Dashboard Overview";
+            mainContent.Controls.Clear();
+
+            FlowLayoutPanel flow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoScroll = true };
+            mainContent.Controls.Add(flow);
+
+            Label lblWelcome = new Label { Text = $"Welcome back, {Program.CurrentUser?.Name}!", Font = new Font("Segoe UI", 20, FontStyle.Bold), Margin = new Padding(0, 0, 0, 20), AutoSize = true };
+            flow.Controls.Add(lblWelcome);
+            flow.SetFlowBreak(lblWelcome, true);
+
+            // Stats Cards
+            int gridW = mainContent.ClientSize.Width > 100 ? mainContent.ClientSize.Width - 60 : 800;
+            FlowLayoutPanel statsFlow = new FlowLayoutPanel { Width = gridW, Height = 140 };
+            flow.Controls.Add(statsFlow);
+
+            AddStatCard(statsFlow, "Total Orders", "...", Color.FromArgb(59, 130, 246));
+            AddStatCard(statsFlow, "Total Spent", "...", Color.FromArgb(16, 185, 129));
+            AddStatCard(statsFlow, "Member Since", Program.CurrentUser?.CreatedAt.ToString("MMM yyyy") ?? "N/A", Color.FromArgb(139, 92, 246));
+
+            // Two columns layout for Overview
+            Panel cols = new Panel { Width = gridW, Height = 500, Margin = new Padding(0, 20, 0, 0) };
+            flow.Controls.Add(cols);
+
+            // Left: Profile Summary
+            Panel profileCard = new Panel { Width = 350, Height = 400, BackColor = Color.White, Location = new Point(0, 0) };
+            UIHelper.SetRoundedRegion(profileCard, 15);
+            cols.Controls.Add(profileCard);
+            
+            Label pTitle = new Label { Text = "Profile Details", Font = new Font("Segoe UI", 14, FontStyle.Bold), Location = new Point(25, 25), AutoSize = true };
+            profileCard.Controls.Add(pTitle);
+
+            AddProfileInfo(profileCard, "📧 Email", Program.CurrentUser?.Email ?? "", 80);
+            AddProfileInfo(profileCard, "📱 Phone", Program.CurrentUser?.Phone ?? "", 130);
+            AddProfileInfo(profileCard, "📍 Location", "Addis Ababa, Ethiopia", 180);
+
+            Button btnEdit = new Button { Text = "Edit Profile", Location = new Point(25, 320), Size = new Size(300, 45), BackColor = Color.FromArgb(243, 244, 246), FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 10, FontStyle.Bold) };
+            UIHelper.SetRoundedRegion(btnEdit, 8);
+            btnEdit.Click += (s, e) => ShowSettings();
+            profileCard.Controls.Add(btnEdit);
+
+            // Right: Recent Orders
+            Panel recentCard = new Panel { Width = cols.Width - 380, Height = 400, BackColor = Color.White, Location = new Point(380, 0), Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right };
+            UIHelper.SetRoundedRegion(recentCard, 15);
+            cols.Controls.Add(recentCard);
+
+            Label rTitle = new Label { Text = "Recent Orders", Font = new Font("Segoe UI", 14, FontStyle.Bold), Location = new Point(25, 25), AutoSize = true };
+            recentCard.Controls.Add(rTitle);
+
+            FlowLayoutPanel recFlow = new FlowLayoutPanel { Name = "recFlow", Location = new Point(25, 70), Size = new Size(recentCard.Width - 50, 300), AutoScroll = true, Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right };
+            recentCard.Controls.Add(recFlow);
+
+            _ = LoadOverviewDataAsync(statsFlow, recFlow);
+        }
+
+        private void AddProfileInfo(Panel p, string label, string val, int y)
+        {
+            Label l = new Label { Text = label, Font = new Font("Segoe UI", 9, FontStyle.Bold), ForeColor = Color.Gray, Location = new Point(25, y), AutoSize = true };
+            Label v = new Label { Text = val ?? "N/A", Font = new Font("Segoe UI", 11), Location = new Point(25, y + 20), AutoSize = true };
+            p.Controls.Add(l);
+            p.Controls.Add(v);
+        }
+
+        private void AddStatCard(FlowLayoutPanel container, string title, string val, Color color)
+        {
+            Panel card = new Panel { Width = 220, Height = 100, BackColor = Color.White, Margin = new Padding(0, 0, 20, 0) };
+            UIHelper.SetRoundedRegion(card, 15);
             container.Controls.Add(card);
 
-            Panel indicator = new Panel { Dock = DockStyle.Left, Width = 6, BackColor = accent };
-            card.Controls.Add(indicator);
+            Panel accent = new Panel { Dock = DockStyle.Left, Width = 6, BackColor = color };
+            card.Controls.Add(accent);
 
-            Label tLbl = new Label { Text = title, Location = new Point(15, 15), AutoSize = true, ForeColor = Color.Gray, Font = new Font("Segoe UI", 9) };
-            card.Controls.Add(tLbl);
-
-            Label vLbl = new Label { Name = "val_" + title.Replace(" ", ""), Text = val, Location = new Point(15, 40), AutoSize = true, Font = new Font("Segoe UI", 14, FontStyle.Bold), ForeColor = Color.FromArgb(44, 62, 80) };
-            card.Controls.Add(vLbl);
+            Label t = new Label { Text = title, Font = new Font("Segoe UI", 9, FontStyle.Bold), ForeColor = Color.Gray, Location = new Point(20, 20), AutoSize = true };
+            Label v = new Label { Name = "stat_" + title.Replace(" ", ""), Text = val, Font = new Font("Segoe UI", 16, FontStyle.Bold), ForeColor = Color.FromArgb(31, 41, 55), Location = new Point(20, 45), AutoSize = true };
+            card.Controls.Add(t);
+            card.Controls.Add(v);
         }
 
-        private async Task LoadDataAsync()
+        private async Task LoadOverviewDataAsync(FlowLayoutPanel stats, FlowLayoutPanel recFlow)
         {
             try
             {
                 if (Program.CurrentUser == null) return;
-                
                 var orders = await ApiClient.GetCustomerOrdersAsync(Program.CurrentUser.UserID);
                 
                 if (this.IsDisposed) return;
 
                 this.Invoke(new Action(() => {
-                    // Update stats
                     var totalSpent = orders.Where(o => o.Status == "Paid").Sum(o => o.TotalAmount);
-                    if (content.Controls.Find("val_TotalOrders", true).FirstOrDefault() is Label oLbl) oLbl.Text = orders.Count.ToString();
-                    if (content.Controls.Find("val_TotalSpent", true).FirstOrDefault() is Label sLbl) sLbl.Text = $"{totalSpent:N0} ETB";
+                    if (stats.Controls.Find("stat_TotalOrders", true).FirstOrDefault() is Label oL) oL.Text = orders.Count.ToString();
+                    if (stats.Controls.Find("stat_TotalSpent", true).FirstOrDefault() is Label sL) sL.Text = $"{totalSpent:N0} ETB";
 
-                    // Load orders
-                    ordersFlow.Controls.Clear();
+                    recFlow.Controls.Clear();
                     if (orders.Count == 0)
                     {
-                        ordersFlow.Controls.Add(new Label { Text = "No orders yet. Enjoy our delicious menu!", AutoSize = true, ForeColor = Color.Gray, Margin = new Padding(0, 50, 0, 0) });
+                        recFlow.Controls.Add(new Label { Text = "No orders yet. Place your first order today!", AutoSize = true, Margin = new Padding(0, 50, 0, 0) });
                     }
                     else
                     {
-                        foreach (var order in orders.Take(5))
+                        foreach (var o in orders.Take(4))
                         {
-                            Panel p = MkOrderStrip(order);
-                            ordersFlow.Controls.Add(p);
+                            recFlow.Controls.Add(MkOrderStrip(o, recFlow.Width - 30));
                         }
                     }
                 }));
             }
-            catch { /* API silent fail */ }
+            catch { }
         }
 
-        private Panel MkOrderStrip(OrderDto order)
+        private void ShowOrders()
         {
-            Panel p = new Panel { Size = new Size(390, 80), BackColor = Color.White, Margin = new Padding(0, 0, 0, 12) };
+            lblPanelTitle.Text = "My Order History";
+            mainContent.Controls.Clear();
+
+            FlowLayoutPanel flow = new FlowLayoutPanel { Dock = DockStyle.Fill, AutoScroll = true, Padding = new Padding(0, 0, 20, 0) };
+            mainContent.Controls.Add(flow);
+
+            _ = LoadFullOrdersAsync(flow);
+        }
+
+        private async Task LoadFullOrdersAsync(FlowLayoutPanel flow)
+        {
+            try
+            {
+                if (Program.CurrentUser == null) return;
+                var orders = await ApiClient.GetCustomerOrdersAsync(Program.CurrentUser.UserID);
+                this.Invoke(new Action(() => {
+                    flow.Controls.Clear();
+                    foreach (var o in orders)
+                    {
+                        flow.Controls.Add(MkOrderStrip(o, mainContent.Width - 100));
+                    }
+                }));
+            }
+            catch { }
+        }
+
+        private Control MkOrderStrip(OrderModel o, int w)
+        {
+            Panel p = new Panel { Size = new Size(w, 70), BackColor = Color.FromArgb(249, 250, 251), Margin = new Padding(0, 0, 0, 10) };
             UIHelper.SetRoundedRegion(p, 10);
+
+            Label id = new Label { Text = "#" + o.OrderID, Font = new Font("Segoe UI", 10, FontStyle.Bold), Location = new Point(15, 25), AutoSize = true };
+            Label date = new Label { Text = o.OrderDate.ToString("MMM dd, yyyy"), Font = new Font("Segoe UI", 10), ForeColor = Color.Gray, Location = new Point(80, 25), AutoSize = true };
+            Label amt = new Label { Text = o.TotalAmount.ToString("N0") + " ETB", Font = new Font("Segoe UI", 11, FontStyle.Bold), ForeColor = Color.FromArgb(31, 41, 55), Location = new Point(w - 200, 24), AutoSize = true };
             
-            Label id = new Label { Text = "Order #" + order.OrderID, Font = new Font("Segoe UI", 10, FontStyle.Bold), Location = new Point(15, 15), AutoSize = true };
-            p.Controls.Add(id);
-
-            Label dt = new Label { Text = order.OrderDate.ToString("MMM dd, yyyy"), ForeColor = Color.Gray, Location = new Point(15, 40), AutoSize = true };
-            p.Controls.Add(dt);
-
-            Label amt = new Label { Text = $"{order.TotalAmount:N0} ETB", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = accentColor, Location = new Point(260, 15), AutoSize = false, Size = new Size(110, 30), TextAlign = ContentAlignment.TopRight };
-            p.Controls.Add(amt);
-
-            string st = order.Status ?? "Pending";
             Label status = new Label { 
-                Text = st.ToUpper(), 
+                Text = o.Status.ToUpper(), 
                 Font = new Font("Segoe UI", 8, FontStyle.Bold), 
-                ForeColor = st == "Paid" ? Color.SeaGreen : Color.Orange, 
-                Location = new Point(260, 45), 
-                AutoSize = false, Size = new Size(110, 20), 
-                TextAlign = ContentAlignment.TopRight 
+                ForeColor = Color.White, 
+                BackColor = o.Status == "Paid" ? Color.FromArgb(16, 185, 129) : Color.FromArgb(245, 158, 11),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Size = new Size(80, 24),
+                Location = new Point(w - 90, 23)
             };
-            p.Controls.Add(status);
+            UIHelper.SetRoundedRegion(status, 12);
 
+            p.Controls.Add(id); p.Controls.Add(date); p.Controls.Add(amt); p.Controls.Add(status);
             return p;
         }
+
+        private void OpenOrderForm()
+        {
+            var orderForm = new OrderForm();
+            orderForm.ShowDialog();
+            ShowOverview(); // Refresh
+        }
+
+        private void ShowSettings()
+        {
+            lblPanelTitle.Text = "Account Settings";
+            mainContent.Controls.Clear();
+            Label lbl = new Label { Text = "Setting page under construction. Contact support to update profile.", AutoSize = true, Location = new Point(20, 20) };
+            mainContent.Controls.Add(lbl);
+        }
+    }
+
+    public class OrderModel
+    {
+        public int OrderID { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string Status { get; set; } = "";
+        public DateTime OrderDate { get; set; }
     }
 }

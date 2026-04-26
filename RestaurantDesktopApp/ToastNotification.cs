@@ -36,7 +36,7 @@ namespace RestaurantDesktopApp
             this.Controls.Add(lblMessage);
 
             // Position it at bottom right
-            Rectangle workingArea = Screen.PrimaryScreen.WorkingArea;
+            Rectangle workingArea = (Screen.PrimaryScreen ?? Screen.AllScreens[0]).WorkingArea;
             this.Location = new Point(workingArea.Right - this.Width - 20, workingArea.Bottom - this.Height - 20);
 
             timer = new System.Windows.Forms.Timer();

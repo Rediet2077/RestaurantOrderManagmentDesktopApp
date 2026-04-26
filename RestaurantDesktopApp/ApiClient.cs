@@ -15,7 +15,7 @@ namespace RestaurantDesktopApp
     public static class ApiClient
     {
         private static readonly HttpClient _http;
-        public static string BaseUrl { get; set; } = "http://localhost:49391/api";
+        public static string BaseUrl { get; set; } = "http://localhost:49393/api";
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -40,7 +40,9 @@ namespace RestaurantDesktopApp
                 var response = await _http.PostAsJsonAsync("auth/login", new { Email = email, Password = password });
                 if (response.IsSuccessStatusCode)
                     return await response.Content.ReadFromJsonAsync<LoginResponse>(_jsonOptions);
-                return new LoginResponse { Success = false, Message = "Invalid email or password." };
+                
+                var errorResult = await response.Content.ReadFromJsonAsync<LoginResponse>(_jsonOptions);
+                return errorResult ?? new LoginResponse { Success = false, Message = "Invalid email or password." };
             }
             catch (HttpRequestException)
             {
@@ -139,6 +141,16 @@ namespace RestaurantDesktopApp
             catch { return new(); }
         }
 
+        public static async Task<List<TableDto>> GetTablesAsync()
+        {
+            try
+            {
+                return await _http.GetFromJsonAsync<List<TableDto>>("tables", _jsonOptions) ?? new();
+            }
+            catch { return new(); }
+        }
+
+
         public static async Task<bool> UpdateTableStatusAsync(int tableId, string status)
         {
             try
@@ -151,7 +163,7 @@ namespace RestaurantDesktopApp
 
         // ── Orders ───────────────────────────────────────────────────────
 
-        public static async Task<int> CreateOrderAsync(int? customerId, int tableId, decimal totalAmount, List<OrderItemDto> items)
+        public static async Task<int> CreateOrderAsync(int? customerId, int? tableId, decimal totalAmount, List<OrderItemDto> items)
         {
             try
             {
@@ -193,6 +205,15 @@ namespace RestaurantDesktopApp
             catch { return new(); }
         }
 
+        public static async Task<List<OrderDetailDto>> GetOrderDetailsAsync(int orderId)
+        {
+            try
+            {
+                return await _http.GetFromJsonAsync<List<OrderDetailDto>>($"orders/{orderId}/details", _jsonOptions) ?? new();
+            }
+            catch { return new(); }
+        }
+
         public static async Task<List<CustomerDto>> GetCustomersAsync()
         {
             try
@@ -213,6 +234,27 @@ namespace RestaurantDesktopApp
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
+        }
+
+        public static async Task<bool> SubmitReceiptAsync(int orderId, string content)
+        {
+            try
+            {
+                var response = await _http.PostAsJsonAsync("payments/receipt",
+                    new ReceiptRequest { OrderID = orderId, ReceiptContent = content });
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
+        public static async Task<DataTable> GetReceiptsTableAsync()
+        {
+            try
+            {
+                var receipts = await _http.GetFromJsonAsync<List<ReceiptDto>>("payments/receipts", _jsonOptions);
+                return ToDataTable(receipts);
+            }
+            catch { return new DataTable(); }
         }
 
         // ── Users / Staff ────────────────────────────────────────────────
@@ -325,8 +367,10 @@ namespace RestaurantDesktopApp
         public string Role { get; set; } = "";
         public string FullName { get; set; } = "";
         public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
         public int UserID { get; set; }
         public string Message { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
     }
 
     public class MenuItemDto
@@ -360,6 +404,14 @@ namespace RestaurantDesktopApp
         public int ItemID { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+    }
+
+    public class OrderDetailDto
+    {
+        public int ItemID { get; set; }
+        public string ItemName { get; set; } = "";
+        public int Quantity { get; set; }
+        public decimal Subtotal { get; set; }
     }
 
     public class CustomerDto
@@ -398,5 +450,19 @@ namespace RestaurantDesktopApp
         public string RestaurantName { get; set; } = "LAUNCH";
         public string Currency { get; set; } = "Birr (ETB)";
         public string DarkMode { get; set; } = "False";
+    }
+
+    public class ReceiptRequest
+    {
+        public int OrderID { get; set; }
+        public string ReceiptContent { get; set; } = "";
+    }
+
+    public class ReceiptDto
+    {
+        public int ReceiptID { get; set; }
+        public int OrderID { get; set; }
+        public string ReceiptContent { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
     }
 }

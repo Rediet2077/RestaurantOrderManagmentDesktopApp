@@ -12,7 +12,7 @@ namespace RestaurantDesktopApp
         private bool dragging = false;
         private Point dragCursorPoint;
         private Point dragFormPoint;
-        private Panel _divider;
+        private Panel _divider = null!;
 
         public LoginForm()
         {
@@ -73,8 +73,8 @@ namespace RestaurantDesktopApp
                 string link = navLinks[i];
                 Label nl = new Label { Text = link, Font = new Font("Segoe UI", 11), ForeColor = Color.White, AutoSize = true, Cursor = Cursors.Hand, Anchor = AnchorStyles.Top | AnchorStyles.Right };
                 nl.Location  = new Point(navBar.Width - 475 + i * 160, 22);
-                nl.MouseEnter += (s2, e2) => ((Label)s2).ForeColor = Color.FromArgb(250, 163, 7);
-                nl.MouseLeave += (s2, e2) => ((Label)s2).ForeColor = Color.White;
+                nl.MouseEnter += (s2, e2) => { if (s2 is Label l) l.ForeColor = Color.FromArgb(250, 163, 7); };
+                nl.MouseLeave += (s2, e2) => { if (s2 is Label l) l.ForeColor = Color.White; };
                 if (link == "Home") nl.Click += (s2, e2) => this.Close();
                 navBar.Controls.Add(nl);
             }
@@ -515,7 +515,6 @@ namespace RestaurantDesktopApp
 
             int rightW = bg_w - divX;
             int cardW  = Math.Min(460, rightW - 40);
-            // Keep existing height (changes between login/register views)
             loginPanel.Size     = new Size(cardW, loginPanel.Height);
             loginPanel.Location = new Point(divX + (rightW - cardW) / 2, Math.Max(20, (bg_h - loginPanel.Height) / 2));
             loginPanel.BringToFront();
@@ -531,6 +530,7 @@ namespace RestaurantDesktopApp
         }
 
         // ── Timers & events ─────────────────────────────────────────────
+
         private void fadeTimer_Tick(object sender, EventArgs e)
         {
             if (this.Opacity < 1) this.Opacity += 0.05;
@@ -562,8 +562,10 @@ namespace RestaurantDesktopApp
                     UserID = result.UserID,
                     Name = result.FullName,
                     Email = result.Email,
+                    Phone = result.Phone,
                     Role = result.Role,
-                    Token = result.Token
+                    Token = result.Token,
+                    CreatedAt = result.CreatedAt
                 };
 
                 UIHelper.ShowToast($"Welcome back, {result.FullName}!");

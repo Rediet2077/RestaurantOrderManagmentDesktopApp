@@ -14,6 +14,7 @@ namespace RestaurantDesktopApp
         public string Role { get; set; } = "";
         public string Phone { get; set; } = "";
         public string Token { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
     }
 
     internal static class Program

@@ -11,6 +11,7 @@ namespace RestaurantDesktopApp
         private Panel headerPanel;
         private Panel mainScrollPanel;
         private FlowLayoutPanel navFlow;
+        private string _activePage = "HOME";
 
         // Section panels (kept as fields for resize)
         private Panel heroPanel;
@@ -32,9 +33,11 @@ namespace RestaurantDesktopApp
 
         public class CartItem
         {
+            public int ItemID { get; set; }
             public string Name { get; set; }
             public decimal Price { get; set; }
             public int Quantity { get; set; }
+            public string ImagePath { get; set; }
         }
 
         // Hero internal controls (resized dynamically)
@@ -138,6 +141,13 @@ namespace RestaurantDesktopApp
                 var menuItems = await ApiClient.GetMenuItemsAsync();
                 if (menuItems != null && menuItems.Count > 0)
                 {
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+                    _apiMenuItems = menuItems;
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
                     UpdateDishesUI(menuItems);
                     UpdateServiceGrid(menuItems);
                 }
@@ -159,21 +169,47 @@ namespace RestaurantDesktopApp
                 Label nav = new Label();
                 nav.Text = item;
                 nav.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+<<<<<<< Updated upstream
                 nav.ForeColor = (item == "LOGIN" || item == "PROFILE") ? accentOrange : textLight;
+=======
+<<<<<<< HEAD
+                nav.ForeColor = (item == "LOGIN" || item == "PROFILE") ? accentOrange : textLight;
+=======
+                nav.ForeColor = (item == _activePage) ? accentOrange : textLight;
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
                 nav.AutoSize = true;
                 nav.Cursor = Cursors.Hand;
                 nav.Margin = new Padding(10, 0, 10, 0);
                 nav.TextAlign = ContentAlignment.MiddleCenter;
                 nav.Padding = new Padding(0, 24, 0, 0);
 
+<<<<<<< Updated upstream
                 nav.MouseEnter += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = accentOrange; };
                 nav.MouseLeave += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = textLight; };
+=======
+<<<<<<< HEAD
+                nav.MouseEnter += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = accentOrange; };
+                nav.MouseLeave += (s, e) => { if (nav.Text != "LOGIN" && nav.Text != "PROFILE") nav.ForeColor = textLight; };
+=======
+                nav.MouseEnter += (s, e) => { if (nav.Text != _activePage) nav.ForeColor = accentOrange; };
+                nav.MouseLeave += (s, e) => { if (nav.Text != _activePage) nav.ForeColor = textLight; };
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
 
                 if (item == "LOGIN")
                 {
                     nav.Click += (s, e) => {
                         var loginForm = new LoginForm();
+<<<<<<< Updated upstream
                         loginForm.FormClosed += (s2, e2) => { this.Show(); RefreshHeader(); };
+=======
+<<<<<<< HEAD
+                        loginForm.FormClosed += (s2, e2) => { this.Show(); RefreshHeader(); };
+=======
+                        loginForm.FormClosed += (s2, e2) => { this.Show(); ShowPage("HOME"); };
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
                         this.Hide();
                         loginForm.Show();
                     };
@@ -186,6 +222,13 @@ namespace RestaurantDesktopApp
                 else if (item == "HOME") nav.Click += (s, e) => ShowPage("HOME");
                 else if (item == "CONTACT") nav.Click += (s, e) => ShowPage("CONTACT");
                 else if (item == "SERVICE") nav.Click += (s, e) => ShowPage("SERVICE");
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+                else if (item == "CART") nav.Click += (s, e) => ShowCartOverlay();
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
 
                 navFlow.Controls.Add(nav);
             }
@@ -264,6 +307,14 @@ namespace RestaurantDesktopApp
         {
             if (_svcGrid == null) return;
             _svcGrid.Controls.Clear();
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+            
+            // Add API items
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
             foreach (var item in items)
             {
                 _svcGrid.Controls.Add(MkFoodCard(
@@ -272,13 +323,55 @@ namespace RestaurantDesktopApp
                     5, 
                     item.Price, 
                     item.IsAvailable ? "" : "Sold Out", 
+<<<<<<< Updated upstream
                     item.ImagePath));
             }
+=======
+<<<<<<< HEAD
+                    item.ImagePath));
+            }
+=======
+                    item.ImagePath,
+                    item.ItemID));
+            }
+
+            // If API has few items, add some high-quality featured ones to make it look full
+            if (items.Count < 12)
+            {
+                var featured = new[] {
+                    new { Name = "Double Cheese Burger", Cat = "International", Price = 180m, Img = "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop" },
+                    new { Name = "BBQ Chicken Pizza",    Cat = "International", Price = 280m, Img = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=200&fit=crop" },
+                    new { Name = "Pasta Carbonara",      Cat = "International", Price = 160m, Img = "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300&h=200&fit=crop" },
+                    new { Name = "Grilled Salmon",       Cat = "International", Price = 350m, Img = "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=300&h=200&fit=crop" },
+                    new { Name = "Classic Lasagna",      Cat = "International", Price = 210m, Img = "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=300&h=200&fit=crop" },
+                    new { Name = "Steak Frites",         Cat = "International", Price = 420m, Img = "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=300&h=200&fit=crop" },
+                    new { Name = "Seafood Paella",       Cat = "International", Price = 380m, Img = "https://images.unsplash.com/photo-1534080564607-c984d718f000?w=300&h=200&fit=crop" },
+                    new { Name = "Greek Salad",          Cat = "Healthy",       Price = 120m, Img = "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&h=200&fit=crop" },
+                    new { Name = "Grilled Chicken",      Cat = "International", Price = 150m, Img = "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=300&h=200&fit=crop" },
+                    new { Name = "Seafood Pasta",        Cat = "International", Price = 230m, Img = "https://images.unsplash.com/photo-1563379091339-03b21ef4a4f8?w=300&h=200&fit=crop" },
+                    new { Name = "Veggie Supreme Pizza", Cat = "International", Price = 190m, Img = "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=300&h=200&fit=crop" },
+                    new { Name = "Chocolate Lava Cake",  Cat = "Desserts",      Price = 90m,  Img = "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300&h=200&fit=crop" }
+                };
+
+                foreach (var f in featured)
+                {
+                    if (!items.Exists(i => i.Name.Equals(f.Name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _svcGrid.Controls.Add(MkFoodCard(f.Name, f.Cat, 5, f.Price, "Featured", f.Img, 0));
+                    }
+                }
+            }
+
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
             LayoutService();
         }
 
         private void ShowPage(string page)
         {
+            _activePage = page;
+            RefreshHeader();
+
             // Hide all content panels first
             heroPanel.Visible    = false;
             aboutPanel.Visible   = false;
@@ -364,6 +457,7 @@ namespace RestaurantDesktopApp
             navFlow.Padding = new Padding(0);
             navFlow.Margin = new Padding(0);
 
+<<<<<<< HEAD
             string[] navItems = { "HOME", "ABOUT", "SERVICE", "LOGIN", "CONTACT" };
             foreach (string item in navItems)
             {
@@ -410,16 +504,20 @@ namespace RestaurantDesktopApp
 
                 navFlow.Controls.Add(nav);
             }
+=======
+            navFlow.Margin = new Padding(0);
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
 
             headerPanel.Controls.Add(navFlow);
+            RefreshHeader();
             PositionNav(); // initial positioning
         }
 
         private void PositionNav()
         {
             if (navFlow == null) return;
-            navFlow.Size = new Size(400, 72);
-            navFlow.Location = new Point(headerPanel.Width - 430, 0);
+            navFlow.Size = new Size(500, 72);
+            navFlow.Location = new Point(headerPanel.Width - 530, 0);
         }
 
         // ═══════════════════════════════════════════════════════
@@ -469,6 +567,7 @@ namespace RestaurantDesktopApp
             orderBtn.FlatAppearance.BorderSize = 0;
             orderBtn.Size = new Size(170, 48);
             orderBtn.Cursor = Cursors.Hand;
+            orderBtn.Click += (s, e) => ShowPage("SERVICE");
             heroPanel.Controls.Add(orderBtn);
 
             // Building image
@@ -790,6 +889,7 @@ namespace RestaurantDesktopApp
             moreBtn.FlatAppearance.BorderSize = 0;
             moreBtn.Size = new Size(180, 55);
             moreBtn.Cursor = Cursors.Hand;
+            moreBtn.Click += (s, e) => ShowPage("SERVICE");
             moreBtn.Paint += RoundedPanel_Paint;
             dishesPanel.Controls.Add(moreBtn);
             moreBtn.BringToFront();
@@ -831,7 +931,7 @@ namespace RestaurantDesktopApp
             string[] texts =
             {
                 "About Us\n\nContact Us\n\nReservation\n\nPrivacy Policy",
-                "123 Street, DEBRE BIRHAN\nUNIVERSITY\n\n+125976542311\n\ninfo@dbulaunch.com",
+                "123 Street, ADDIS ABABA\n\n+125976542311\n\ninfo@bestrestaurant.com",
                 "Monday - Sunday:\n6:00 AM - 12:00 PM\n\nDelivery Hours:\n7:00 AM - 11:30 PM",
                 "Subscribe to our newsletter\nfor special offers and updates."
             };
@@ -1001,10 +1101,25 @@ namespace RestaurantDesktopApp
                 new { Name = "Fatira with Honey",      Cat = "Snacks",        Stars = 4, Price = 35m,  Tag = "Sweet",        Img = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=300&h=200&fit=crop" },
                 new { Name = "Fresh Mango Juice",      Cat = "Beverages",     Stars = 5, Price = 35m,  Tag = "",             Img = "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=300&h=200&fit=crop" },
                 new { Name = "Ethiopian Coffee",       Cat = "Beverages",     Stars = 5, Price = 15m,  Tag = "Hot",          Img = "https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=300&h=200&fit=crop" },
+<<<<<<< Updated upstream
+=======
+=======
+                new { Name = "Chicken Burger",      Cat = "International", Stars = 5, Price = 120m, Tag = "Popular",      Img = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop" },
+                new { Name = "Beef Burger",         Cat = "International", Stars = 5, Price = 150m, Tag = "Bestseller",   Img = "https://images.unsplash.com/photo-1550547660-d9450f859349?w=300&h=200&fit=crop" },
+                new { Name = "Margherita Pizza",    Cat = "International", Stars = 4, Price = 200m, Tag = "",             Img = "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=300&h=200&fit=crop" },
+                new { Name = "Pepperoni Pizza",     Cat = "International", Stars = 5, Price = 250m, Tag = "Chef Special", Img = "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300&h=200&fit=crop" },
+                new { Name = "Grilled Tilapia",     Cat = "International", Stars = 4, Price = 120m, Tag = "Healthy",      Img = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&h=200&fit=crop" },
+                new { Name = "Pasta Carbonara",     Cat = "International", Stars = 4, Price = 160m, Tag = "",             Img = "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=300&h=200&fit=crop" },
+                new { Name = "Double Cheese Burger",Cat = "International", Stars = 5, Price = 180m, Tag = "New",           Img = "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=300&h=200&fit=crop" },
+                new { Name = "BBQ Chicken Pizza",   Cat = "International", Stars = 5, Price = 280m, Tag = "",             Img = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&h=200&fit=crop" },
+                new { Name = "Fresh Mango Juice",   Cat = "Beverages",     Stars = 5, Price = 35m,  Tag = "",             Img = "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=300&h=200&fit=crop" },
+                new { Name = "Ethiopian Coffee",    Cat = "Beverages",     Stars = 5, Price = 15m,  Tag = "Classic",      Img = "https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=300&h=200&fit=crop" },
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
             };
 
             foreach (var f in foods)
-                _svcGrid.Controls.Add(MkFoodCard(f.Name, f.Cat, f.Stars, f.Price, f.Tag, f.Img));
+                _svcGrid.Controls.Add(MkFoodCard(f.Name, f.Cat, f.Stars, f.Price, f.Tag, f.Img, 0));
 
             // Setup Filter clicks
             for (int i = 0; i < filters.Length; i++)
@@ -1041,7 +1156,15 @@ namespace RestaurantDesktopApp
             LayoutService();
         }
 
+<<<<<<< Updated upstream
         private Panel MkFoodCard(string name, string cat, int stars, decimal price, string tag, string imgUrl)
+=======
+<<<<<<< HEAD
+        private Panel MkFoodCard(string name, string cat, int stars, decimal price, string tag, string imgUrl)
+=======
+        private Panel MkFoodCard(string name, string cat, int stars, decimal price, string tag, string imgUrl, int itemId)
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
         {
             const int CW = 240, CH = 330;
             Color cardShadow = Color.FromArgb(226, 232, 240);
@@ -1137,7 +1260,7 @@ namespace RestaurantDesktopApp
             // ─ Add to Cart button ──────────────────────────────────────────
             Button addBtn = new Button
             {
-                Text      = "\ud83d\uded2  Add to Cart",
+                Text      = "+ ADD TO CART",
                 Font      = new Font("Segoe UI", 10, FontStyle.Bold),
                 BackColor = accentOrange, ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat, Cursor = Cursors.Hand,
@@ -1148,16 +1271,34 @@ namespace RestaurantDesktopApp
             
             decimal capturedPrice = price;
             string capturedName = name;
+            int capturedItemId = itemId;
             
-            addBtn.Click += (s, e) =>
+            string capturedImgUrl = imgUrl;
+
+            addBtn.Click += async (s, e) =>
             {
-                var existing = _cartItems.Find(c => c.Name == capturedName);
+                var existing = _cartItems.Find(c => (capturedItemId > 0 && c.ItemID == capturedItemId) || (c.Name == capturedName));
                 if (existing != null) existing.Quantity++;
+<<<<<<< Updated upstream
                 else _cartItems.Add(new CartItem { Name = capturedName, Price = capturedPrice, Quantity = 1 });
+=======
+<<<<<<< HEAD
+                else _cartItems.Add(new CartItem { Name = capturedName, Price = capturedPrice, Quantity = 1 });
+=======
+                else _cartItems.Add(new CartItem { ItemID = capturedItemId, Name = capturedName, Price = capturedPrice, Quantity = 1, ImagePath = capturedImgUrl });
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
 
                 _cartCount++;
                 _svcCartBtn.Text = $"\ud83d\uded2  Cart ({_cartCount})";
-                UIHelper.ShowToast($"{capturedName} added to cart!");
+                
+                // Visual Feedback
+                string oldText = addBtn.Text;
+                addBtn.Text = "✓ ADDED";
+                addBtn.BackColor = Color.FromArgb(34, 197, 94); // Green
+                await Task.Delay(1000);
+                addBtn.Text = oldText;
+                addBtn.BackColor = accentOrange;
             };
             card.Controls.Add(addBtn);
 
@@ -1279,20 +1420,45 @@ namespace RestaurantDesktopApp
                     decimal lineTotal = item.Price * item.Quantity;
                     total += lineTotal;
                 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+>>>>>>> Stashed changes
                     Panel itemPan = new Panel { Size = new Size(460, 50), Location = new Point(10, cy), BackColor = Color.FromArgb(249, 250, 251) };
+=======
+                    Panel itemPan = new Panel { Size = new Size(460, 60), Location = new Point(10, cy), BackColor = Color.FromArgb(249, 250, 251) };
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
                     itemPan.Paint += RoundedPanel_Paint;
                     listPan.Controls.Add(itemPan);
 
-                    Label qtyLbl = new Label { Text = $"{item.Quantity}x", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = accentOrange, AutoSize = true, Location = new Point(15, 13) };
-                    Label nmLbl = new Label { Text = item.Name, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = true, Location = new Point(50, 13) };
+                    PictureBox pic = new PictureBox { Size = new Size(50, 40), Location = new Point(10, 10), SizeMode = PictureBoxSizeMode.Zoom };
+                    if (!string.IsNullOrEmpty(item.ImagePath)) _ = UIHelper.LoadImageAsync(pic, item.ImagePath);
+                    itemPan.Controls.Add(pic);
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+>>>>>>> Stashed changes
                     Label prLbl = new Label { Text = $"{lineTotal} ETB", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = false, TextAlign = ContentAlignment.TopRight, Size = new Size(100, 25), Location = new Point(340, 13) };
+=======
+                    Label qtyLbl = new Label { Text = $"{item.Quantity}x", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = accentOrange, AutoSize = true, Location = new Point(70, 18) };
+                    Label nmLbl = new Label { Text = item.Name, Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = true, Location = new Point(110, 18) };
+
+                    Label prLbl = new Label { Text = $"{lineTotal} ETB", Font = new Font("Segoe UI", 12, FontStyle.Bold), ForeColor = textDark, AutoSize = false, TextAlign = ContentAlignment.TopRight, Size = new Size(100, 25), Location = new Point(340, 18) };
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
                     
                     itemPan.Controls.Add(qtyLbl);
                     itemPan.Controls.Add(nmLbl);
                     itemPan.Controls.Add(prLbl);
 
+<<<<<<< HEAD
                     cy += 60;
+<<<<<<< Updated upstream
+=======
+=======
+                    cy += 70;
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
                 }
 
                 Panel bottomLine = new Panel { BackColor = Color.FromArgb(229, 231, 235), Size = new Size(480, 2), Location = new Point(30, 380) };
@@ -1410,17 +1576,91 @@ namespace RestaurantDesktopApp
             dialog.Size = new Size(460, 610);
             dialog.Location = new Point((_paymentOverlay.Width - dialog.Width) / 2, (_paymentOverlay.Height - dialog.Height) / 2);
             confBtn.FlatAppearance.BorderSize = 0;
-            confBtn.Click += (s, e) => {
+            confBtn.Click += async (s, e) => {
                 if (firstRadio.Checked == false && string.IsNullOrWhiteSpace(phoneBox.Text) && !dialog.Controls[7].Text.Contains("Cash")) 
                 {
                     // A simple check if they didn't pick cash, they should enter a phone number. But keeping it simple.
                 }
 
-                UIHelper.ShowToast("Payment Successful! Your order has been placed.");
-                _cartItems.Clear();
-                _cartCount = 0;
-                _svcCartBtn.Text = "\ud83d\uded2  Cart (0)";
-                _paymentOverlay.Visible = false;
+                confBtn.Enabled = false;
+                confBtn.Text = "Processing...";
+
+                try
+                {
+                    var orderItems = new List<OrderItemDto>();
+                    foreach (var item in _cartItems)
+                    {
+                        orderItems.Add(new OrderItemDto
+                        {
+                            ItemID = item.ItemID,
+                            Quantity = item.Quantity,
+                            Price = item.Price
+                        });
+                    }
+
+                    int? customerId = Program.CurrentUser?.UserID;
+                    // Provide a generic table ID (e.g. 0 or null) for online/takeaway orders
+                    int orderId = await ApiClient.CreateOrderAsync(customerId, null, totalAmount, orderItems);
+
+                    if (orderId > 0)
+                    {
+                        // Generate Receipt
+                        var settings = await ApiClient.GetSettingsAsync();
+                        string restaurantName = settings?.RestaurantName ?? "BEST Restaurant";
+                        string customerName = Program.CurrentUser?.Name ?? "Guest Customer";
+
+                        System.Text.StringBuilder receipt = new System.Text.StringBuilder();
+                        receipt.AppendLine("==================================");
+                        receipt.AppendLine($"    {restaurantName.ToUpper()}    ");
+                        receipt.AppendLine("==================================");
+                        receipt.AppendLine($"Order ID: {orderId}");
+                        receipt.AppendLine($"Customer: {customerName}");
+                        receipt.AppendLine($"Date: {DateTime.Now:yyyy-MM-dd HH:mm}");
+                        receipt.AppendLine("----------------------------------");
+                        receipt.AppendLine(string.Format("{0,-20} {1,5} {2,8}", "Item", "Qty", "Price"));
+                        
+                        foreach (var item in _cartItems)
+                        {
+                            receipt.AppendLine(string.Format("{0,-20} {1,5} {2,8:N2}", 
+                                item.Name.Length > 20 ? item.Name.Substring(0, 17) + "..." : item.Name, 
+                                item.Quantity, 
+                                item.Price * item.Quantity));
+                        }
+
+                        receipt.AppendLine("----------------------------------");
+                        receipt.AppendLine(string.Format("{0,-20} {1,14:N2}", "TOTAL:", totalAmount));
+                        receipt.AppendLine("==================================");
+                        receipt.AppendLine("      THANK YOU FOR ORDERING!     ");
+                        receipt.AppendLine("==================================");
+
+                        string receiptContent = receipt.ToString();
+
+                        // Send receipt to admin
+                        await ApiClient.SubmitReceiptAsync(orderId, receiptContent);
+
+                        UIHelper.ShowToast("Payment Successful! Your order has been placed.");
+                        _cartItems.Clear();
+                        _cartCount = 0;
+                        _svcCartBtn.Text = "🛒  Cart (0)";
+                        _paymentOverlay.Visible = false;
+
+                        // Show receipt to user
+                        UIHelper.ShowReceiptDialog(receiptContent, this);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to place order. Please try again.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error placing order: " + ex.Message);
+                }
+                finally
+                {
+                    confBtn.Enabled = true;
+                    confBtn.Text = "Confirm Order";
+                }
             };
             dialog.Controls.Add(confBtn);
         }
@@ -1495,43 +1735,18 @@ namespace RestaurantDesktopApp
                     TextBox msgBox = new TextBox
                     {
                         Multiline = true, ScrollBars = ScrollBars.Vertical,
-                        Font = new Font("Segoe UI", 10),
+                        Font = new Font("Segoe UI", 11),
                         BackColor = Color.FromArgb(248, 250, 252),
                         BorderStyle = BorderStyle.FixedSingle,
-                        ForeColor = Color.FromArgb(156, 163, 175),
-                        Text = "Please check the box above to enable",
-                        Enabled = false,
+                        ForeColor = Color.FromArgb(17, 24, 39),
+                        Text = "Write your message here...",
                         Name = "ctMessage"
                     };
+                    
+                    msgBox.GotFocus += (s, e) => { if (msgBox.Text == "Write your message here...") { msgBox.Text = ""; } };
+                    msgBox.LostFocus += (s, e) => { if (string.IsNullOrWhiteSpace(msgBox.Text)) { msgBox.Text = "Write your message here..."; } };
+
                     card.Controls.Add(msgBox);
-
-                    // Note box
-                    Panel noteBox = new Panel { BackColor = Color.FromArgb(219, 234, 254), Name = "ctNote" };
-                    Label noteLbl = new Label
-                    {
-                        Text = "Note: Please check the box below to enable the message field",
-                        Font = new Font("Segoe UI", 9),
-                        ForeColor = Color.FromArgb(29, 78, 216),
-                        AutoSize = true, Name = "ctNoteLbl"
-                    };
-                    noteBox.Controls.Add(noteLbl);
-                    card.Controls.Add(noteBox);
-
-                    // Checkbox to enable message
-                    CheckBox chk = new CheckBox
-                    {
-                        Text = "Questions or Comments?",
-                        Font = new Font("Segoe UI", 10),
-                        ForeColor = Color.FromArgb(55, 65, 81),
-                        AutoSize = true, Name = "ctChk"
-                    };
-                    chk.CheckedChanged += (s, ev) =>
-                    {
-                        msgBox.Enabled = chk.Checked;
-                        if (chk.Checked) { msgBox.Text = ""; msgBox.ForeColor = Color.FromArgb(17,24,39); }
-                        else { msgBox.Text = "Please check the box above to enable"; msgBox.ForeColor = Color.FromArgb(156,163,175); }
-                    };
-                    card.Controls.Add(chk);
                 }
             }
 
@@ -1551,18 +1766,25 @@ namespace RestaurantDesktopApp
             card.Controls.Add(submitBtn);
 
             // Right side — image
-            string imgPath = System.IO.Path.Combine(Application.StartupPath, "img", "picdescktop.jpg");
             PictureBox contactPic = new PictureBox
             {
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 BackColor = Color.FromArgb(200, 210, 230),
                 Name = "ctPic"
             };
+<<<<<<< HEAD
             if (System.IO.File.Exists(imgPath))
             {
                 try { contactPic.Image = Image.FromFile(imgPath); }
                 catch { contactPic.BackColor = Color.FromArgb(230, 230, 230); }
             }
+<<<<<<< Updated upstream
+=======
+=======
+            _ = UIHelper.LoadImageAsync(contactPic, "https://images.unsplash.com/photo-1596524430615-b46475ddff6e?w=500&q=80"); // Contact us / phone image
+
+>>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
+>>>>>>> Stashed changes
             contactPic.Paint += RoundedPanel_Paint;
             card.Controls.Add(contactPic);
 
@@ -1641,21 +1863,12 @@ namespace RestaurantDesktopApp
             // Message label + textarea
             Control lblMsg = card.Controls["ctLbl4"];
             Control msg    = card.Controls["ctMessage"];
-            Panel   note   = (Panel)card.Controls["ctNote"];
-            Control chk    = card.Controls["ctChk"];
             Control sub    = card.Controls["ctSubmit"];
 
             if (lblMsg != null) lblMsg.Location = new Point(x0, 292);
-            if (msg    != null) { msg.Location  = new Point(x0, 312); ((TextBox)msg).Size = new Size(leftW, 90); }
-            if (note   != null)
-            {
-                note.Size     = new Size(leftW, 28);
-                note.Location = new Point(x0, 408);
-                Control nl = note.Controls["ctNoteLbl"];
-                if (nl != null) nl.Location = new Point(8, 6);
-            }
-            if (chk != null) chk.Location = new Point(x0, 442);
-            if (sub != null) { sub.Size = new Size(leftW, 42); sub.Location = new Point(x0, 480); }
+            if (msg    != null) { msg.Location  = new Point(x0, 312); ((TextBox)msg).Size = new Size(leftW, 110); } // Made taller since no checkbox
+
+            if (sub != null) { sub.Size = new Size(leftW, 42); sub.Location = new Point(x0, 440); }
 
             // Right side — image
             Control pic = card.Controls["ctPic"];

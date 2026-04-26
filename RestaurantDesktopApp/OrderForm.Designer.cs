@@ -16,6 +16,8 @@ namespace RestaurantDesktopApp
         private Label lblTitle;
         private System.Windows.Forms.FlowLayoutPanel flpMenu;
         private Label lblMenuTitle;
+        private System.Windows.Forms.Label lblCategory;
+        private System.Windows.Forms.ComboBox cmbCategory;
 
         protected override void Dispose(bool disposing)
         {
@@ -41,6 +43,8 @@ namespace RestaurantDesktopApp
             this.lblTitle = new System.Windows.Forms.Label();
             this.flpMenu = new System.Windows.Forms.FlowLayoutPanel();
             this.lblMenuTitle = new System.Windows.Forms.Label();
+            this.lblCategory = new System.Windows.Forms.Label();
+            this.cmbCategory = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOrderDetails)).BeginInit();
             this.headerPanel.SuspendLayout();
             this.SuspendLayout();
@@ -124,6 +128,26 @@ namespace RestaurantDesktopApp
             this.lblMenuTitle.TabIndex = 15;
             this.lblMenuTitle.Text = "Select Food";
             // 
+            // lblCategory
+            // 
+            this.lblCategory.AutoSize = true;
+            this.lblCategory.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblCategory.Location = new System.Drawing.Point(180, 115);
+            this.lblCategory.Name = "lblCategory";
+            this.lblCategory.Size = new System.Drawing.Size(73, 19);
+            this.lblCategory.TabIndex = 16;
+            this.lblCategory.Text = "Category:";
+            // 
+            // cmbCategory
+            // 
+            this.cmbCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbCategory.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.cmbCategory.Location = new System.Drawing.Point(260, 112);
+            this.cmbCategory.Name = "cmbCategory";
+            this.cmbCategory.Size = new System.Drawing.Size(150, 25);
+            this.cmbCategory.TabIndex = 17;
+            this.cmbCategory.SelectedIndexChanged += new System.EventHandler(this.cmbCategory_SelectedIndexChanged);
+            // 
             // dgvOrderDetails
             // 
             this.dgvOrderDetails.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -189,6 +213,8 @@ namespace RestaurantDesktopApp
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
             this.ClientSize = new System.Drawing.Size(1000, 550);
+            this.Controls.Add(this.cmbCategory);
+            this.Controls.Add(this.lblCategory);
             this.Controls.Add(this.lblMenuTitle);
             this.Controls.Add(this.flpMenu);
             this.Controls.Add(this.btnPlaceOrder);
