@@ -7,7 +7,7 @@ namespace RestaurantDesktopApp
 {
     public partial class ReportForm : Form
     {
-        private Button btnExport = null!;
+        private Button btnExport;
 
         public ReportForm()
         {
@@ -72,8 +72,7 @@ namespace RestaurantDesktopApp
 
                 if (dgvReport.Columns.Contains("TotalSales"))
                 {
-                    var col = dgvReport.Columns["TotalSales"];
-                    if (col != null) col.DefaultCellStyle.Format = UIHelper.GetCurrencySymbol() + " #,##0.00";
+                    dgvReport.Columns["TotalSales"].DefaultCellStyle.Format = UIHelper.GetCurrencySymbol() + " #,##0.00";
                 }
 
                 if (dt.Rows.Count > 0 && dt.Rows[0]["TotalSales"] != DBNull.Value)

@@ -90,9 +90,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                decimal.TryParse(price, out decimal p);
-                var response = await _http.PostAsJsonAsync("menu",
-                    new { Name = name, Price = p, Category = category, ImagePath = imagePath });
+                var response = await _http.PostAsJsonAsync("menu", new { Name = name, Price = decimal.Parse(price), Category = category, ImagePath = imagePath });
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -102,9 +100,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                decimal.TryParse(price, out decimal p);
-                var response = await _http.PutAsJsonAsync($"menu/{id}",
-                    new { Name = name, Price = p, Category = category, ImagePath = imagePath });
+                var response = await _http.PutAsJsonAsync($"menu/{id}", new { Name = name, Price = decimal.Parse(price), Category = category, ImagePath = imagePath });
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -126,36 +122,17 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var tables = await _http.GetFromJsonAsync<List<TableDto>>("tables", _jsonOptions);
+                var tables = await _http.GetFromJsonAsync<List<TableModel>>("tables", _jsonOptions);
                 return ToDataTable(tables);
             }
             catch { return new DataTable(); }
         }
 
-        public static async Task<List<TableDto>> GetAvailableTablesAsync()
-        {
-            try
-            {
-                return await _http.GetFromJsonAsync<List<TableDto>>("tables/available", _jsonOptions) ?? new();
-            }
-            catch { return new(); }
-        }
-
-        public static async Task<List<TableDto>> GetTablesAsync()
-        {
-            try
-            {
-                return await _http.GetFromJsonAsync<List<TableDto>>("tables", _jsonOptions) ?? new();
-            }
-            catch { return new(); }
-        }
-
-
         public static async Task<bool> UpdateTableStatusAsync(int tableId, string status)
         {
             try
             {
-                var response = await _http.PutAsJsonAsync($"tables/{tableId}/status", new { Status = status });
+                var response = await _http.PutAsJsonAsync($"tables/{tableId}/status", status);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -163,23 +140,15 @@ namespace RestaurantDesktopApp
 
         // ── Orders ───────────────────────────────────────────────────────
 
-        public static async Task<int> CreateOrderAsync(int? customerId, int? tableId, decimal totalAmount, List<OrderItemDto> items)
+        public static async Task<int> CreateOrderAsync(CreateOrderRequest req)
         {
             try
             {
-                var request = new
-                {
-                    CustomerID = customerId,
-                    TableID = tableId,
-                    TotalAmount = totalAmount,
-                    Status = "Pending",
-                    Items = items
-                };
-                var response = await _http.PostAsJsonAsync("orders", request);
+                var response = await _http.PostAsJsonAsync("orders", req);
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadFromJsonAsync<JsonElement>();
-                    return result.GetProperty("orderID").GetInt32();
+                    var result = await response.Content.ReadFromJsonAsync<OrderCreatedResponse>(_jsonOptions);
+                    return result?.OrderID ?? -1;
                 }
                 return -1;
             }
@@ -190,47 +159,37 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var orders = await _http.GetFromJsonAsync<List<OrderDto>>("orders/pending", _jsonOptions);
+                var orders = await _http.GetFromJsonAsync<List<OrderModel>>("orders/pending", _jsonOptions);
                 return ToDataTable(orders);
             }
             catch { return new DataTable(); }
         }
 
-        public static async Task<List<OrderDto>> GetCustomerOrdersAsync(int userId)
+        public static async Task<List<OrderModel>> GetCustomerOrdersAsync(int customerId)
         {
             try
             {
-                return await _http.GetFromJsonAsync<List<OrderDto>>($"orders/customer/{userId}", _jsonOptions) ?? new();
+                return await _http.GetFromJsonAsync<List<OrderModel>>($"orders/customer/{customerId}", _jsonOptions) ?? new();
             }
             catch { return new(); }
         }
 
-        public static async Task<List<OrderDetailDto>> GetOrderDetailsAsync(int orderId)
+        public static async Task<List<OrderDetailModel>> GetOrderDetailsAsync(int orderId)
         {
             try
             {
-                return await _http.GetFromJsonAsync<List<OrderDetailDto>>($"orders/{orderId}/details", _jsonOptions) ?? new();
-            }
-            catch { return new(); }
-        }
-
-        public static async Task<List<CustomerDto>> GetCustomersAsync()
-        {
-            try
-            {
-                return await _http.GetFromJsonAsync<List<CustomerDto>>("orders/customers", _jsonOptions) ?? new();
+                return await _http.GetFromJsonAsync<List<OrderDetailModel>>($"orders/{orderId}/details", _jsonOptions) ?? new();
             }
             catch { return new(); }
         }
 
         // ── Payments ─────────────────────────────────────────────────────
 
-        public static async Task<bool> ProcessPaymentAsync(int orderId, decimal amount, string method = "Cash")
+        public static async Task<bool> ProcessPaymentAsync(int orderId, decimal amount, string method)
         {
             try
             {
-                var response = await _http.PostAsJsonAsync("payments",
-                    new { OrderID = orderId, Amount = amount, PaymentMethod = method });
+                var response = await _http.PostAsJsonAsync("payments/process", new { OrderID = orderId, Amount = amount, PaymentMethod = method });
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -240,7 +199,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var response = await _http.PostAsJsonAsync("payments/receipt",
+                var response = await _http.PostAsJsonAsync("payments/receipt", 
                     new ReceiptRequest { OrderID = orderId, ReceiptContent = content });
                 return response.IsSuccessStatusCode;
             }
@@ -251,19 +210,19 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var receipts = await _http.GetFromJsonAsync<List<ReceiptDto>>("payments/receipts", _jsonOptions);
+                var receipts = await _http.GetFromJsonAsync<List<ReceiptModel>>("payments/receipts", _jsonOptions);
                 return ToDataTable(receipts);
             }
             catch { return new DataTable(); }
         }
 
-        // ── Users / Staff ────────────────────────────────────────────────
+        // ── Staff ────────────────────────────────────────────────────────
 
         public static async Task<DataTable> GetStaffTableAsync()
         {
             try
             {
-                var staff = await _http.GetFromJsonAsync<List<StaffDto>>("users", _jsonOptions);
+                var staff = await _http.GetFromJsonAsync<List<UserModel>>("users/staff", _jsonOptions);
                 return ToDataTable(staff);
             }
             catch { return new DataTable(); }
@@ -273,8 +232,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var response = await _http.PostAsJsonAsync("users",
-                    new { Username = username, Password = password, Role = role });
+                var response = await _http.PostAsJsonAsync("users/staff", new { Username = username, Password = password, Role = role });
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -284,7 +242,7 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var response = await _http.DeleteAsync($"users/{username}");
+                var response = await _http.DeleteAsync($"users/staff/{username}");
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -292,12 +250,9 @@ namespace RestaurantDesktopApp
 
         // ── Stats ────────────────────────────────────────────────────────
 
-        public static async Task<DashboardStatsDto?> GetStatsAsync()
+        public static async Task<DashboardStats?> GetStatsAsync()
         {
-            try
-            {
-                return await _http.GetFromJsonAsync<DashboardStatsDto>("stats", _jsonOptions);
-            }
+            try { return await _http.GetFromJsonAsync<DashboardStats>("stats", _jsonOptions); }
             catch { return null; }
         }
 
@@ -305,72 +260,67 @@ namespace RestaurantDesktopApp
         {
             try
             {
-                var rows = await _http.GetFromJsonAsync<List<DailyReportDto>>("stats/daily-report", _jsonOptions);
-                return ToDataTable(rows);
+                var report = await _http.GetFromJsonAsync<List<DailyReportRow>>("stats/daily-report", _jsonOptions);
+                return ToDataTable(report);
             }
             catch { return new DataTable(); }
         }
 
         // ── Settings ─────────────────────────────────────────────────────
 
-        public static async Task<SettingsDto?> GetSettingsAsync()
+        public static async Task<SettingsModel?> GetSettingsAsync()
         {
-            try
-            {
-                return await _http.GetFromJsonAsync<SettingsDto>("settings", _jsonOptions);
-            }
+            try { return await _http.GetFromJsonAsync<SettingsModel>("settings", _jsonOptions); }
             catch { return null; }
         }
 
-        public static async Task<bool> SaveSettingsAsync(string restaurantName, string currency, string darkMode)
+        public static async Task<bool> SaveSettingsAsync(SettingsModel settings)
         {
             try
             {
-                var response = await _http.PutAsJsonAsync("settings",
-                    new { RestaurantName = restaurantName, Currency = currency, DarkMode = darkMode });
+                var response = await _http.PostAsJsonAsync("settings", settings);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
         }
 
-        // ── Helper: Convert list to DataTable ────────────────────────────
+        public static async Task<DataTable> GetCustomersTableAsync()
+        {
+            try
+            {
+                var customers = await _http.GetFromJsonAsync<List<CustomerModel>>("users/customers", _jsonOptions);
+                return ToDataTable(customers);
+            }
+            catch { return new DataTable(); }
+        }
+
+        // ── Helpers ───────────────────────────────────────────────────────
 
         private static DataTable ToDataTable<T>(List<T>? items)
         {
-            var dt = new DataTable();
+            DataTable dt = new DataTable(typeof(T).Name);
             if (items == null || items.Count == 0) return dt;
 
             var props = typeof(T).GetProperties();
-            foreach (var prop in props)
-            {
-                var colType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-                dt.Columns.Add(prop.Name, colType);
-            }
+            foreach (var p in props) dt.Columns.Add(p.Name, Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType);
 
             foreach (var item in items)
             {
-                var row = dt.NewRow();
-                foreach (var prop in props)
-                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
-                dt.Rows.Add(row);
+                var values = new object?[props.Length];
+                for (int i = 0; i < props.Length; i++) values[i] = props[i].GetValue(item);
+                dt.Rows.Add(values);
             }
             return dt;
         }
     }
 
-    // ─── DTO classes for the desktop app ─────────────────────────────────
+    // ── DTO Models ────────────────────────────────────────────────────
 
     public class LoginResponse
     {
         public bool Success { get; set; }
-        public string Token { get; set; } = "";
-        public string Role { get; set; } = "";
-        public string FullName { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Phone { get; set; } = "";
-        public int UserID { get; set; }
         public string Message { get; set; } = "";
-        public DateTime CreatedAt { get; set; }
+        public AppUser? User { get; set; }
     }
 
     public class MenuItemDto
@@ -383,7 +333,7 @@ namespace RestaurantDesktopApp
         public bool IsAvailable { get; set; }
     }
 
-    public class TableDto
+    public class TableModel
     {
         public int TableID { get; set; }
         public string TableNumber { get; set; } = "";
@@ -391,7 +341,26 @@ namespace RestaurantDesktopApp
         public string Status { get; set; } = "";
     }
 
-    public class OrderDto
+    public class CreateOrderRequest
+    {
+        public int? CustomerID { get; set; }
+        public int? TableID { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string Status { get; set; } = "Pending";
+        public List<CartItemDto> Items { get; set; } = new();
+    }
+
+    public class CartItemDto
+    {
+        public int ItemID { get; set; }
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    public class OrderCreatedResponse { public int OrderID { get; set; } }
+
+    public class OrderModel
     {
         public int OrderID { get; set; }
         public decimal TotalAmount { get; set; }
@@ -399,14 +368,7 @@ namespace RestaurantDesktopApp
         public DateTime OrderDate { get; set; }
     }
 
-    public class OrderItemDto
-    {
-        public int ItemID { get; set; }
-        public int Quantity { get; set; }
-        public decimal Price { get; set; }
-    }
-
-    public class OrderDetailDto
+    public class OrderDetailModel
     {
         public int ItemID { get; set; }
         public string ItemName { get; set; } = "";
@@ -414,40 +376,27 @@ namespace RestaurantDesktopApp
         public decimal Subtotal { get; set; }
     }
 
-    public class CustomerDto
+    public class DashboardStats
     {
-        public int CustomerID { get; set; }
-        public string Name { get; set; } = "";
-    }
-
-    public class StaffDto
-    {
-        public int UserID { get; set; }
-        public string Username { get; set; } = "";
-        public string Role { get; set; } = "";
-    }
-
-    public class DashboardStatsDto
-    {
-        public string TotalRevenue { get; set; } = "0.00";
+        public string TotalRevenue { get; set; } = "0";
         public int TotalOrders { get; set; }
         public int AvailableTables { get; set; }
         public int TotalTables { get; set; }
-        public int ActiveStaff { get; set; }
         public int PendingOrders { get; set; }
         public int MenuItemCount { get; set; }
+        public int ActiveStaff { get; set; }
     }
 
-    public class DailyReportDto
+    public class DailyReportRow
     {
         public string Date { get; set; } = "";
         public int TotalOrders { get; set; }
         public decimal TotalSales { get; set; }
     }
 
-    public class SettingsDto
+    public class SettingsModel
     {
-        public string RestaurantName { get; set; } = "LAUNCH";
+        public string RestaurantName { get; set; } = "BEST Restaurant";
         public string Currency { get; set; } = "Birr (ETB)";
         public string DarkMode { get; set; } = "False";
     }
@@ -458,11 +407,27 @@ namespace RestaurantDesktopApp
         public string ReceiptContent { get; set; } = "";
     }
 
-    public class ReceiptDto
+    public class ReceiptModel
     {
         public int ReceiptID { get; set; }
         public int OrderID { get; set; }
         public string ReceiptContent { get; set; } = "";
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class CustomerModel
+    {
+        public int CustomerID { get; set; }
+        public string Name { get; set; } = "";
+    }
+
+    public class UserModel
+    {
+        public int UserID { get; set; }
+        public string FullName { get; set; } = "";
+        public string Username { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Role { get; set; } = "";
+        public string Phone { get; set; } = "";
     }
 }

@@ -7,9 +7,9 @@ namespace RestaurantDesktopApp
 {
     public partial class Menu_Form : Form
     {
-        private TextBox txtSearch = null!;
-        private Button btnExport = null!;
-        private PictureBox picPreview = null!;
+        private TextBox txtSearch;
+        private Button btnExport;
+        private PictureBox picPreview;
 
         public Menu_Form()
         {
@@ -19,50 +19,40 @@ namespace RestaurantDesktopApp
             _ = LoadMenuItemsAsync();
             ApplyInteractivity();
         }
+
         private void SetupAdvancedFeatures()
         {
             // Search Bar
             txtSearch = new TextBox();
             txtSearch.Size = new Size(200, 25);
-            txtSearch.Location = new Point(550, 220); // Moved down below inputs
+            txtSearch.Location = new Point(dgvMenuItems.Left + dgvMenuItems.Width - 200, 185);
             txtSearch.PlaceholderText = "Search menu...";
             txtSearch.TextChanged += (s, e) => FilterMenu();
             this.Controls.Add(txtSearch);
 
             Label lblSearch = new Label();
             lblSearch.Text = "🔍 Search:";
-            lblSearch.Location = new Point(470, 223); // Moved down below inputs
+            lblSearch.Location = new Point(txtSearch.Left - 70, 188);
             lblSearch.AutoSize = true;
-            this.Controls.Add(lblSearch);
 
             // Export Button
             btnExport = new Button();
             btnExport.Text = "Export to CSV";
             btnExport.Size = new Size(120, 30);
-            btnExport.Location = new Point(30, 220); // Moved down below inputs
+            btnExport.Location = new Point(dgvMenuItems.Left, 182);
             btnExport.Click += (s, e) => UIHelper.ExportToCSV(dgvMenuItems, "Menu_Export_" + DateTime.Now.ToString("yyyyMMdd"));
             this.Controls.Add(btnExport);
 
-            // Image Preview (Restored)
+            // Image Preview
             picPreview = new PictureBox();
             picPreview.Size = new Size(150, 150);
-            picPreview.Location = new Point(450, 60); // Placed safely on the right
+            picPreview.Location = new Point(450, 71);
             picPreview.BorderStyle = BorderStyle.FixedSingle;
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.BackColor = Color.White;
             this.Controls.Add(picPreview);
 
             UIHelper.ApplyModernButton(btnExport, UIHelper.SuccessColor);
-
-            if (this.Controls["headerPanel"] is Panel header)
-            {
-                header.Visible = false;
-            }
-            
-            // Adjust DataGridView location
-            dgvMenuItems.Location = new Point(30, 260);
-            dgvMenuItems.Size = new Size(720, 240);
-            dgvMenuItems.Visible = true;
         }
 
         private void ApplyInteractivity()
@@ -203,7 +193,7 @@ namespace RestaurantDesktopApp
             }
         }
 
-        private void dgvMenuItems_CellClick(object? sender, DataGridViewCellEventArgs e)
+        private void dgvMenuItems_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
@@ -234,7 +224,6 @@ namespace RestaurantDesktopApp
             txtPrice.Clear();
             txtCategory.Clear();
             txtImagePath.Clear();
-            picPreview.Image = null;
         }
 
         private async System.Threading.Tasks.Task LoadMenuItemsAsync()

@@ -55,7 +55,7 @@ namespace RestaurantDesktopApp
                     UIHelper.ApplyTheme(this);
 
                     // Find top level form and apply theme
-                    Form? parent = this.FindForm();
+                    Form parent = this.FindForm();
                     if (parent != null)
                     {
                         UIHelper.ApplyTheme(parent);
