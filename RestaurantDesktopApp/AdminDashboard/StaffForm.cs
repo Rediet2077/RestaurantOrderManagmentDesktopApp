@@ -69,8 +69,8 @@ namespace RestaurantDesktopApp
                 var val = dgvStaff.SelectedRows[0].Cells["Username"].Value;
                 if (val == null) return;
 
-                string user = val?.ToString() ?? "";
-                if (string.IsNullOrEmpty(user) || user == "admin")
+                string user = val.ToString();
+                if (user == "admin")
                 {
                     UIHelper.ShowToast("Cannot delete admin.", true);
                     return;
