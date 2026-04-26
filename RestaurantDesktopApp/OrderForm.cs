@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Linq;
 
 namespace RestaurantDesktopApp
 {
@@ -18,13 +19,17 @@ namespace RestaurantDesktopApp
         public OrderForm()
         {
             InitializeComponent();
-            this.WindowState = FormWindowState.Maximized;
+            this.Size = new Size(1000, 700);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.WindowState = FormWindowState.Normal;
+            this.BackColor = Color.FromArgb(243, 244, 246);
             
             dgvOrderDetails.Visible = false; // Hide old cart
             
             flpCart = new FlowLayoutPanel {
                 AutoScroll = true,
-                BackColor = Color.FromArgb(248, 250, 252)
+                BackColor = Color.White,
+                Padding = new Padding(10)
             };
             this.Controls.Add(flpCart);
             this.Resize += OrderForm_Resize;
@@ -37,35 +42,54 @@ namespace RestaurantDesktopApp
         {
             if (headerPanel != null) headerPanel.Width = this.Width;
             
-            // Filters area
-            if (lblMenuTitle != null) lblMenuTitle.Location = new Point(30, 100);
-            if (lblCategory != null) lblCategory.Location = new Point(180, 100);
-            if (cmbCategory != null) cmbCategory.Location = new Point(260, 97);
+            // Compact Header area
+            if (lblTable != null) lblTable.Location = new Point(25, 75);
+            if (cmbTables != null) cmbTables.Location = new Point(75, 72);
+            if (lblCustomer != null) lblCustomer.Location = new Point(220, 75);
+            if (cmbCustomers != null) cmbCustomers.Location = new Point(300, 72);
+
+            if (lblMenuTitle != null) {
+                lblMenuTitle.Text = "MENU";
+                lblMenuTitle.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+                lblMenuTitle.Location = new Point(25, 115);
+            }
+            if (lblCategory != null) lblCategory.Location = new Point(140, 118);
+            if (cmbCategory != null) cmbCategory.Location = new Point(210, 115);
             
-            int leftWidth = (int)(this.Width * 0.65);
+            int leftWidth = (int)(this.ClientSize.Width * 0.62);
             if (flpMenu != null)
             {
-                flpMenu.Location = new Point(30, 140);
-                flpMenu.Size = new Size(leftWidth - 60, this.Height - 170);
+                flpMenu.Location = new Point(25, 150);
+                flpMenu.Size = new Size(leftWidth - 40, this.ClientSize.Height - 170);
+                flpMenu.BackColor = Color.Transparent;
             }
 
             int rightX = leftWidth;
-            int rightWidth = this.Width - leftWidth - 30;
+            int rightWidth = this.ClientSize.Width - leftWidth - 25;
             
             if (flpCart != null)
             {
-                flpCart.Location = new Point(rightX, 140);
-                flpCart.Size = new Size(rightWidth, this.Height - 300);
+                flpCart.Location = new Point(rightX, 70);
+                flpCart.Size = new Size(rightWidth, this.ClientSize.Height - 220);
+                UIHelper.SetRoundedRegion(flpCart, 15);
             }
 
-            if (lblTotal != null) lblTotal.Location = new Point(rightX, this.Height - 140);
-            if (lblTotalAmount != null) lblTotalAmount.Location = new Point(rightX + 150, this.Height - 140);
+            if (lblTotal != null) {
+                lblTotal.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+                lblTotal.Location = new Point(rightX + 10, this.ClientSize.Height - 130);
+            }
+            if (lblTotalAmount != null) {
+                lblTotalAmount.Font = new Font("Segoe UI", 16, FontStyle.Bold);
+                lblTotalAmount.ForeColor = Color.FromArgb(220, 38, 38);
+                lblTotalAmount.Location = new Point(rightX + 130, this.ClientSize.Height - 135);
+            }
             
             if (btnPlaceOrder != null)
             {
-                btnPlaceOrder.Location = new Point(rightX, this.Height - 90);
-                btnPlaceOrder.Size = new Size(rightWidth, 55);
-                btnPlaceOrder.Font = new Font("Segoe UI", 14, FontStyle.Bold);
+                btnPlaceOrder.Location = new Point(rightX, this.ClientSize.Height - 80);
+                btnPlaceOrder.Size = new Size(rightWidth, 50);
+                btnPlaceOrder.Font = new Font("Segoe UI", 12, FontStyle.Bold);
+                UIHelper.ApplyModernButton(btnPlaceOrder, Color.FromArgb(37, 99, 235));
             }
 
             RenderCart();
@@ -78,66 +102,31 @@ namespace RestaurantDesktopApp
             
             if (orderDetailsTable.Rows.Count == 0)
             {
-                Label empty = new Label { Text = "Your cart is empty.", Font = new Font("Segoe UI", 12), ForeColor = Color.Gray, AutoSize = true, Margin = new Padding(20, 50, 0, 0) };
+                Label empty = new Label { Text = "Cart is empty", Font = new Font("Segoe UI", 10), ForeColor = Color.Gray, AutoSize = true, Margin = new Padding(20, 50, 0, 0) };
                 flpCart.Controls.Add(empty);
                 return;
             }
 
             foreach (DataRow row in orderDetailsTable.Rows)
             {
-                Panel pItem = new Panel { Size = new Size(flpCart.Width - 25, 70), BackColor = Color.White, Margin = new Padding(5) };
+                Panel pItem = new Panel { Size = new Size(flpCart.Width - 35, 60), BackColor = Color.FromArgb(249, 250, 251), Margin = new Padding(0, 0, 0, 8) };
                 UIHelper.SetRoundedRegion(pItem, 10);
 
-                int itemId = Convert.ToInt32(row["ItemID"]);
                 string name = row["ItemName"].ToString() ?? "Unknown";
                 int qty = Convert.ToInt32(row["Quantity"]);
                 decimal subtotal = Convert.ToDecimal(row["Subtotal"]);
 
-                Label lName = new Label { Text = name, Font = new Font("Segoe UI", 11, FontStyle.Bold), Location = new Point(15, 10), AutoSize = true, ForeColor = Color.FromArgb(44, 62, 80) };
-                Label lQty = new Label { Text = $"{qty} x {Convert.ToDecimal(row["Price"]):N2}", Font = new Font("Segoe UI", 10), Location = new Point(15, 35), AutoSize = true, ForeColor = Color.Gray };
+                Label lName = new Label { Text = name, Font = new Font("Segoe UI", 9, FontStyle.Bold), Location = new Point(10, 10), AutoSize = true, ForeColor = Color.FromArgb(31, 41, 55) };
+                Label lQty = new Label { Text = $"{qty} x {Convert.ToDecimal(row["Price"]):N0}", Font = new Font("Segoe UI", 8), Location = new Point(10, 30), AutoSize = true, ForeColor = Color.Gray };
                 
-                Label lSub = new Label { Text = $"{subtotal:N2} ETB", Font = new Font("Segoe UI", 12, FontStyle.Bold), Location = new Point(pItem.Width - 160, 25), AutoSize = true, ForeColor = Color.SeaGreen, Anchor = AnchorStyles.Top | AnchorStyles.Right };
+                Label lSub = new Label { Text = $"{subtotal:N0}", Font = new Font("Segoe UI", 10, FontStyle.Bold), Location = new Point(pItem.Width - 80, 20), AutoSize = true, ForeColor = Color.FromArgb(17, 24, 39), TextAlign = ContentAlignment.MiddleRight };
                 
-                Button btnRemove = new Button { Text = "❌", Font = new Font("Segoe UI Emoji", 10), Size = new Size(35, 35), Location = new Point(pItem.Width - 50, 18), BackColor = Color.FromArgb(239, 68, 68), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Anchor = AnchorStyles.Top | AnchorStyles.Right, Cursor = Cursors.Hand };
+                Button btnRemove = new Button { Text = "×", Font = new Font("Arial", 10, FontStyle.Bold), Size = new Size(24, 24), Location = new Point(pItem.Width - 30, 18), FlatStyle = FlatStyle.Flat, ForeColor = Color.FromArgb(156, 163, 175), Cursor = Cursors.Hand };
                 btnRemove.FlatAppearance.BorderSize = 0;
-                UIHelper.SetRoundedRegion(btnRemove, 8);
-                btnRemove.Click += (s, e) => {
-                    orderDetailsTable.Rows.Remove(row);
-                    UpdateTotalAmount();
-                    RenderCart();
-                };
+                int id = Convert.ToInt32(row["ItemID"]);
+                btnRemove.Click += (s, e) => RemoveFromOrder(id);
 
-                Button btnMinus = new Button { Text = "-", Font = new Font("Segoe UI", 12, FontStyle.Bold), Size = new Size(30, 30), Location = new Point(160, 20), BackColor = Color.FromArgb(226, 232, 240), ForeColor = Color.Black, FlatStyle = FlatStyle.Flat, Cursor = Cursors.Hand };
-                btnMinus.FlatAppearance.BorderSize = 0;
-                UIHelper.SetRoundedRegion(btnMinus, 5);
-                btnMinus.Click += (s, e) => {
-                    if (qty > 1) {
-                        row["Quantity"] = qty - 1;
-                        row["Subtotal"] = (qty - 1) * Convert.ToDecimal(row["Price"]);
-                    } else {
-                        orderDetailsTable.Rows.Remove(row);
-                    }
-                    UpdateTotalAmount();
-                    RenderCart();
-                };
-
-                Button btnPlus = new Button { Text = "+", Font = new Font("Segoe UI", 12, FontStyle.Bold), Size = new Size(30, 30), Location = new Point(200, 20), BackColor = Color.FromArgb(226, 232, 240), ForeColor = Color.Black, FlatStyle = FlatStyle.Flat, Cursor = Cursors.Hand };
-                btnPlus.FlatAppearance.BorderSize = 0;
-                UIHelper.SetRoundedRegion(btnPlus, 5);
-                btnPlus.Click += (s, e) => {
-                    row["Quantity"] = qty + 1;
-                    row["Subtotal"] = (qty + 1) * Convert.ToDecimal(row["Price"]);
-                    UpdateTotalAmount();
-                    RenderCart();
-                };
-
-                pItem.Controls.Add(lName);
-                pItem.Controls.Add(lQty);
-                pItem.Controls.Add(lSub);
-                pItem.Controls.Add(btnRemove);
-                pItem.Controls.Add(btnMinus);
-                pItem.Controls.Add(btnPlus);
-
+                pItem.Controls.Add(lName); pItem.Controls.Add(lQty); pItem.Controls.Add(lSub); pItem.Controls.Add(btnRemove);
                 flpCart.Controls.Add(pItem);
             }
         }
@@ -156,36 +145,29 @@ namespace RestaurantDesktopApp
             orderDetailsTable.Columns.Add("Quantity", typeof(int));
             orderDetailsTable.Columns.Add("Price", typeof(decimal));
             orderDetailsTable.Columns.Add("Subtotal", typeof(decimal));
-            dgvOrderDetails.DataSource = orderDetailsTable;
         }
 
         private async System.Threading.Tasks.Task LoadTables()
         {
             try
             {
-                var tables = await ApiClient.GetAvailableTablesAsync();
+                var tables = await ApiClient.GetTablesAsync("Available");
                 DataTable dt = new DataTable();
                 dt.Columns.Add("TableID", typeof(int));
                 dt.Columns.Add("TableNumber", typeof(string));
+                
+                // Add Takeaway option
+                dt.Rows.Add(0, "Takeaway");
+
                 foreach (var t in tables)
                     dt.Rows.Add(t.TableID, t.TableNumber);
 
                 cmbTables.DataSource = dt;
                 cmbTables.DisplayMember = "TableNumber";
                 cmbTables.ValueMember = "TableID";
-
-                if (dt.Rows.Count == 0)
-                {
-                    // Fallback: Add a Takeaway option if no tables are available in DB
-                    dt.Rows.Add(0, "Takeaway / Counter");
-                }
-                
-                if (dt.Rows.Count > 0)
-                {
-                    cmbTables.SelectedIndex = 0;
-                }
+                cmbTables.SelectedIndex = 0;
             }
-            catch (Exception ex) { MessageBox.Show("Error loading tables: " + ex.Message); }
+            catch { }
         }
 
         private async System.Threading.Tasks.Task LoadCustomers()
@@ -197,11 +179,7 @@ namespace RestaurantDesktopApp
                 dt.Columns.Add("CustomerID", typeof(int));
                 dt.Columns.Add("Name", typeof(string));
 
-                // Add walk-in option
-                DataRow dr = dt.NewRow();
-                dr["CustomerID"] = DBNull.Value;
-                dr["Name"] = "Walk-in";
-                dt.Rows.Add(dr);
+                dt.Rows.Add(DBNull.Value, "Walk-in Guest");
 
                 foreach (var c in customers)
                     dt.Rows.Add(c.CustomerID, c.Name);
@@ -210,15 +188,13 @@ namespace RestaurantDesktopApp
                 cmbCustomers.DisplayMember = "Name";
                 cmbCustomers.ValueMember = "CustomerID";
 
-                // Auto-select if logged in as customer
-                if (Program.CurrentUser != null && Program.CurrentUser.Role == "Customer")
+                if (Program.CurrentUser?.Role == "Customer")
                 {
                     cmbCustomers.SelectedValue = Program.CurrentUser.UserID;
-                    // Optionally disable selection for customers so they can't order for others
                     cmbCustomers.Enabled = false;
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch { }
         }
 
         private async System.Threading.Tasks.Task LoadMenuCards()
@@ -226,75 +202,11 @@ namespace RestaurantDesktopApp
             try
             {
                 allMenuItems = await ApiClient.GetMenuItemsAsync();
-
                 var categories = new List<string> { "All Categories" };
                 foreach (var item in allMenuItems)
                 {
-<<<<<<< HEAD
-                    Panel card = new Panel();
-                    card.Size = new Size(130, 180);
-                    card.BackColor = Color.White;
-                    card.Margin = new Padding(10);
-                    card.BorderStyle = BorderStyle.FixedSingle;
-
-                    PictureBox pic = new PictureBox();
-                    pic.Size = new Size(110, 80);
-                    pic.Location = new Point(10, 10);
-                    pic.SizeMode = PictureBoxSizeMode.Zoom;
-
-                    string imgPath = item.ImagePath ?? "";
-                    string fullPath = Path.Combine(Application.StartupPath, @"..\..\..\", imgPath);
-                    if (!string.IsNullOrEmpty(imgPath) && File.Exists(fullPath))
-                    {
-                        try { pic.Image = Image.FromFile(fullPath); }
-                        catch { pic.BackColor = Color.LightGray; }
-                    }
-                    else
-                        pic.BackColor = Color.LightGray;
-
-                    Label lblName = new Label();
-                    lblName.Text = item.Name ?? "Unknown";
-                    lblName.Location = new Point(10, 100);
-                    lblName.Size = new Size(110, 20);
-                    lblName.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-                    lblName.TextAlign = ContentAlignment.MiddleCenter;
-
-                    Label lblPrice = new Label();
-                    lblPrice.Text = UIHelper.GetCurrencySymbol() + " " + item.Price.ToString("F2");
-                    lblPrice.Location = new Point(10, 120);
-                    lblPrice.Size = new Size(110, 20);
-                    lblPrice.ForeColor = Color.DarkGreen;
-                    lblPrice.TextAlign = ContentAlignment.MiddleCenter;
-
-                    Button btnAdd = new Button();
-                    btnAdd.Text = "+ Add";
-                    btnAdd.Location = new Point(20, 145);
-                    btnAdd.Size = new Size(90, 25);
-                    btnAdd.FlatStyle = FlatStyle.Flat;
-                    btnAdd.BackColor = Color.FromArgb(46, 204, 113);
-                    btnAdd.ForeColor = Color.White;
-                    btnAdd.Cursor = Cursors.Hand;
-
-                    int id = item.ItemID;
-                    string name = item.Name ?? "Unknown";
-                    decimal price = item.Price;
-                    btnAdd.Click += (s, ev) => AddToOrder(id, name, price);
-
-                    card.Controls.Add(pic);
-                    card.Controls.Add(lblName);
-                    card.Controls.Add(lblPrice);
-                    card.Controls.Add(btnAdd);
-
-                    flpMenu.Controls.Add(card);
-
-                    UIHelper.SetRoundedRegion(card, 15);
-                    UIHelper.ApplyModernButton(btnAdd, Color.FromArgb(39, 174, 96));
-=======
                     if (!string.IsNullOrEmpty(item.Category) && !categories.Contains(item.Category))
-                    {
                         categories.Add(item.Category);
-                    }
->>>>>>> 22472b3 (Rebrand to BEST Restaurant, fix customer dashboard, and expand menu variety)
                 }
 
                 cmbCategory.SelectedIndexChanged -= cmbCategory_SelectedIndexChanged;
@@ -304,24 +216,13 @@ namespace RestaurantDesktopApp
 
                 DisplayMenuItems(allMenuItems);
             }
-            catch (Exception ex)
-            {
-                UIHelper.ShowToast("Error loading menu: " + ex.Message, true);
-            }
+            catch (Exception ex) { UIHelper.ShowToast("Error loading menu: " + ex.Message, true); }
         }
 
         private void cmbCategory_SelectedIndexChanged(object? sender, EventArgs e)
         {
             string selectedCategory = cmbCategory.SelectedItem?.ToString() ?? "All Categories";
-            if (selectedCategory == "All Categories")
-            {
-                DisplayMenuItems(allMenuItems);
-            }
-            else
-            {
-                var filtered = allMenuItems.FindAll(i => i.Category == selectedCategory);
-                DisplayMenuItems(filtered);
-            }
+            DisplayMenuItems(selectedCategory == "All Categories" ? allMenuItems : allMenuItems.FindAll(i => i.Category == selectedCategory));
         }
 
         private void DisplayMenuItems(List<MenuItemDto> items)
@@ -329,148 +230,80 @@ namespace RestaurantDesktopApp
             flpMenu.Controls.Clear();
             foreach (var item in items)
             {
-                Panel card = new Panel();
-                card.Size = new Size(130, 180);
-                card.BackColor = Color.White;
-                card.Margin = new Padding(10);
-                card.BorderStyle = BorderStyle.FixedSingle;
+                Panel card = new Panel { Size = new Size(115, 160), BackColor = Color.White, Margin = new Padding(0, 0, 12, 12) };
+                UIHelper.SetRoundedRegion(card, 12);
 
-                PictureBox pic = new PictureBox();
-                pic.Size = new Size(110, 80);
-                pic.Location = new Point(10, 10);
-                pic.SizeMode = PictureBoxSizeMode.Zoom;
+                PictureBox pic = new PictureBox { Size = new Size(115, 80), Dock = DockStyle.Top, SizeMode = PictureBoxSizeMode.CenterImage, BackColor = Color.FromArgb(249, 250, 251) };
+                _ = UIHelper.LoadImageAsync(pic, item.ImagePath);
 
-                string imgPath = item.ImagePath ?? "";
-                _ = UIHelper.LoadImageAsync(pic, imgPath);
+                Label lblName = new Label { Text = item.Name, Font = new Font("Segoe UI", 8, FontStyle.Bold), Location = new Point(8, 88), Size = new Size(100, 30), TextAlign = ContentAlignment.TopCenter };
+                Label lblPrice = new Label { Text = $"{item.Price:N0} ETB", Font = new Font("Segoe UI", 9, FontStyle.Bold), ForeColor = Color.FromArgb(5, 150, 105), Location = new Point(8, 115), Size = new Size(100, 18), TextAlign = ContentAlignment.MiddleCenter };
 
-                Label lblName = new Label();
-                lblName.Text = item.Name ?? "Unknown";
-                lblName.Location = new Point(10, 100);
-                lblName.Size = new Size(110, 20);
-                lblName.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-                lblName.TextAlign = ContentAlignment.MiddleCenter;
+                Button btnAdd = new Button { Text = "+ ADD", Font = new Font("Segoe UI", 8, FontStyle.Bold), Size = new Size(95, 24), Location = new Point(10, 134), FlatStyle = FlatStyle.Flat, BackColor = Color.FromArgb(16, 185, 129), ForeColor = Color.White, Cursor = Cursors.Hand };
+                btnAdd.FlatAppearance.BorderSize = 0;
+                btnAdd.Click += (s, ev) => AddToOrder(item.ItemID, item.Name, item.Price);
 
-                Label lblPrice = new Label();
-                lblPrice.Text = UIHelper.GetCurrencySymbol() + " " + item.Price.ToString("F2");
-                lblPrice.Location = new Point(10, 120);
-                lblPrice.Size = new Size(110, 20);
-                lblPrice.ForeColor = Color.DarkGreen;
-                lblPrice.TextAlign = ContentAlignment.MiddleCenter;
-
-                Button btnAdd = new Button();
-                btnAdd.Text = "+ Add";
-                btnAdd.Location = new Point(20, 145);
-                btnAdd.Size = new Size(90, 25);
-                btnAdd.FlatStyle = FlatStyle.Flat;
-                btnAdd.BackColor = Color.FromArgb(46, 204, 113);
-                btnAdd.ForeColor = Color.White;
-                btnAdd.Cursor = Cursors.Hand;
-
-                int id = item.ItemID;
-                string name = item.Name ?? "Unknown";
-                decimal price = item.Price;
-                btnAdd.Click += (s, ev) => AddToOrder(id, name, price);
-
-                card.Controls.Add(pic);
-                card.Controls.Add(lblName);
-                card.Controls.Add(lblPrice);
-                card.Controls.Add(btnAdd);
-
+                card.Controls.Add(btnAdd); card.Controls.Add(lblPrice); card.Controls.Add(lblName); card.Controls.Add(pic);
                 flpMenu.Controls.Add(card);
-
-                UIHelper.SetRoundedRegion(card, 15);
-                UIHelper.ApplyModernButton(btnAdd, Color.FromArgb(39, 174, 96));
             }
         }
 
-        private void AddToOrder(int itemId, string itemName, decimal price)
+        private void AddToOrder(int id, string name, decimal price)
         {
-            foreach (DataRow row in orderDetailsTable.Rows)
+            DataRow[] existing = orderDetailsTable.Select("ItemID = " + id);
+            if (existing.Length > 0)
             {
-                if (Convert.ToInt32(row["ItemID"]) == itemId)
-                {
-                    row["Quantity"] = Convert.ToInt32(row["Quantity"]) + 1;
-                    row["Subtotal"] = Convert.ToDecimal(row["Quantity"]) * price;
-                    UpdateTotalAmount();
-                    RenderCart();
-                    return;
-                }
+                existing[0]["Quantity"] = Convert.ToInt32(existing[0]["Quantity"]) + 1;
+                existing[0]["Subtotal"] = Convert.ToInt32(existing[0]["Quantity"]) * price;
             }
-            orderDetailsTable.Rows.Add(itemId, itemName, 1, price, price);
-            UpdateTotalAmount();
+            else
+            {
+                orderDetailsTable.Rows.Add(id, name, 1, price, price);
+            }
+            UpdateTotal();
             RenderCart();
         }
 
-        private void UpdateTotalAmount()
+        private void RemoveFromOrder(int id)
         {
-            totalAmount = 0;
-            foreach (DataRow row in orderDetailsTable.Rows)
-            {
-                totalAmount += Convert.ToDecimal(row["Subtotal"]);
-            }
-            lblTotalAmount.Text = UIHelper.GetCurrencySymbol() + " " + totalAmount.ToString("N2");
+            DataRow[] rows = orderDetailsTable.Select("ItemID = " + id);
+            if (rows.Length > 0) orderDetailsTable.Rows.Remove(rows[0]);
+            UpdateTotal();
+            RenderCart();
+        }
+
+        private void UpdateTotal()
+        {
+            totalAmount = orderDetailsTable.AsEnumerable().Sum(r => r.Field<decimal>("Subtotal"));
+            lblTotalAmount.Text = $"{totalAmount:N2}";
         }
 
         private async void btnPlaceOrder_Click(object sender, EventArgs e)
         {
-            if (orderDetailsTable.Rows.Count == 0)
-            {
-                UIHelper.ShowToast("Please add items.", true);
-                return;
-            }
-            if (cmbTables.SelectedValue == null)
-            {
-                UIHelper.ShowToast("Please select a table.", true);
-                return;
-            }
+            if (orderDetailsTable.Rows.Count == 0) { UIHelper.ShowToast("Cart is empty!", true); return; }
 
-            try
-            {
-                // Build order items list
-                var items = new List<OrderItemDto>();
-                foreach (DataRow row in orderDetailsTable.Rows)
-                {
-                    items.Add(new OrderItemDto
-                    {
-                        ItemID = Convert.ToInt32(row["ItemID"]),
-                        Quantity = Convert.ToInt32(row["Quantity"]),
-                        Price = Convert.ToDecimal(row["Price"])
-                    });
-                }
+            int? tableId = cmbTables.SelectedValue as int?;
+            if (tableId == 0) tableId = null; // Takeaway
 
-                int? customerId = null;
-                if (cmbCustomers.SelectedValue != null && cmbCustomers.SelectedValue != DBNull.Value)
-                {
-                    customerId = Convert.ToInt32(cmbCustomers.SelectedValue);
-                }
+            int? customerId = null;
+            if (cmbCustomers.SelectedValue != null && cmbCustomers.SelectedValue != DBNull.Value)
+                customerId = Convert.ToInt32(cmbCustomers.SelectedValue);
 
-                int? tableId = null;
-                if (cmbTables.SelectedValue != null && Convert.ToInt32(cmbTables.SelectedValue) > 0)
-                {
-                    tableId = Convert.ToInt32(cmbTables.SelectedValue);
-                }
-                
-                int orderId = await ApiClient.CreateOrderAsync(customerId, tableId, totalAmount, items);
-                if (orderId > 0)
-                {
-                    UIHelper.ShowToast("Order Placed Successfully!");
-                    // Automatically open payment dialog for this specific order
-                    var payForm = new PaymentForm(orderId);
-                    payForm.StartPosition = FormStartPosition.CenterParent;
-                    payForm.TopMost = true;
-                    payForm.ShowDialog(this); 
-                    
-                    this.Close(); 
-                }
-                else
-                {
-                    UIHelper.ShowToast("Order failed. Please try again.", true);
-                }
-            }
-            catch (Exception ex)
+            var items = new List<CartItemDto>();
+            foreach (DataRow row in orderDetailsTable.Rows)
+                items.Add(new CartItemDto { ItemID = (int)row["ItemID"], Quantity = (int)row["Quantity"], Price = (decimal)row["Price"] });
+
+            var req = new CreateOrderRequest { CustomerID = customerId, TableID = tableId, TotalAmount = totalAmount, Items = items };
+            int orderId = await ApiClient.CreateOrderAsync(req);
+
+            if (orderId > 0)
             {
-                UIHelper.ShowToast("Order Failed: " + ex.Message, true);
+                UIHelper.ShowToast("Order Placed Successfully!");
+                this.Close();
+                // Optionally open payment
+                new PaymentForm(orderId, totalAmount).ShowDialog();
             }
+            else { UIHelper.ShowToast("Failed to place order.", true); }
         }
     }
 }
